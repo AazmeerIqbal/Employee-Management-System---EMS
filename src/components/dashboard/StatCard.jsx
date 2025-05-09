@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "../ui/card";
 import { LucideIcon } from "lucide-react";
 
 const StatCard = ({ title, value, icon: Icon, trend, color = "primary" }) => {

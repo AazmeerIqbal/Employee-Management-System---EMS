@@ -1,5 +1,13 @@
-import Image from "next/image";
+
+import ProtectedRoute from "../src/components/ProtectedRoute";
+import Dashboard from "./dashboard/page";
 
 export default function Home() {
-  return <div>Page</div>;
+  return (
+    <ProtectedRoute requiredPermission="view_dashboard">
+   
+        <Dashboard />
+   
+    </ProtectedRoute>
+  );
 }

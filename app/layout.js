@@ -1,5 +1,12 @@
+"use client";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AuthProvider } from "../src/hooks/useAuth";
 import "./globals.css";
+
+import Sidebar from "../src/components/layout/Sidebar";
+import Navbar from "../src/components/layout/Navbar";
+import { usePathname } from "next/navigation";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,17 +24,30 @@ const geistMono = Geist_Mono({
 // };
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === "/login" || pathname === "/signup";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <title>Employee Management System</title>
       </head>
-      <body
-        suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <AuthProvider>
+          {isLoginPage ? (
+            children
+          ) : (
+            <div className="flex h-screen overflow-hidden bg-background">
+              <Sidebar />
+              <div className="flex flex-col flex-1 overflow-hidden">
+                <Navbar />
+                <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+              </div>
+            </div>
+          )}
+        </AuthProvider>
       </body>
     </html>
   );
 }
+
