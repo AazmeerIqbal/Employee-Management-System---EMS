@@ -48,7 +48,7 @@ const Sidebar = () => {
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1 rounded-md bg-sidebar-accent/20 text-sidebar-foreground hover:bg-sidebar-accent/30"
+          className="p-1 rounded-md bg-[hsl(var(--sidebar-accent)/0.2)] text-sidebar-foreground hover:bg-sidebar-accent/30"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
@@ -64,7 +64,7 @@ const Sidebar = () => {
                 className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/20"
+                    : "text-sidebar-foreground hover:bg-[hsl(var(--sidebar-accent)/0.2)]"
                 }`}
               >
                 <span className="flex items-center justify-center">{item.icon}</span>
@@ -74,10 +74,10 @@ const Sidebar = () => {
           })}
         </nav>
       </div>
-      <div className="p-4 border-t border-sidebar-border/30">
+      <div className="p-4 border-t border-[hsl(var(--sidebar-border)/0.3)]">
         {!collapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-sidebar-accent/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[hsl(var(--sidebar-accent)/0.2)] flex items-center justify-center">
               {user?.name?.charAt(0) || "U"}
             </div>
             <div className="flex flex-col">

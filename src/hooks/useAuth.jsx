@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "./use-toast";
-import { useRouter } from "next/navigation"; // ✅ Next.js router
+import { useRouter } from "next/navigation"; 
 
 const AuthContext = createContext(undefined);
 
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
         description: `Logged in as ${safeUser.name}`,
       });
 
-      router.push("/"); // ✅ Next.js navigation
+      router.push("/");
     } catch (error) {
       toast({
         title: "Login failed",
@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }) => {
         description: "Your account has been created successfully.",
       });
 
-      router.push("/login"); // ✅ Next.js navigation
+      router.push("/login"); 
     } catch (error) {
       toast({
         title: "Signup failed",
@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }) => {
       title: "Logged out",
       description: "You have been logged out successfully",
     });
-    router.push("/login"); // ✅ Next.js navigation
+    router.push("/login"); 
   };
 
   const checkPermission = (permission) => {

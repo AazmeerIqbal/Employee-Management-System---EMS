@@ -1,38 +1,38 @@
-"use client"
+"use client";
 
-import React, { useState } from "react";
-import { Helmet } from "react-helmet";
-import SalaryTable from "../../src/components/salary/SalaryTable";
+import React, { useState } from "react"
+import { Helmet } from "react-helmet"
+import SalaryTable from "../../src/components/salary/SalaryTable"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "../../src/components/ui/dialog";
-import { Button } from "../../src/components/ui/button";
-import { Input } from "../../src/components/ui/input";
+  DialogTitle
+} from "../../src/components/ui/dialog"
+import { Button } from "../../src/components/ui/button"
+import { Input } from "../../src/components/ui/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "../../src/components/ui/select";
+  SelectValue
+} from "../../src/components/ui/select"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "../../src/components/ui/form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { format, parse } from "date-fns";
-import { useToast } from "../../src/hooks/use-toast";
+  FormMessage
+} from "../../src/components/ui/form"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { format, parse } from "date-fns"
+import { useToast } from "../../src/hooks/use-toast"
 
 // Mock salary data
 const mockSalaryRecords = [
@@ -46,7 +46,7 @@ const mockSalaryRecords = [
     currency: "USD",
     effectiveDate: new Date(2023, 3, 1), // April 1, 2023
     type: "annual",
-    status: "active",
+    status: "active"
   },
   {
     id: "2",
@@ -58,7 +58,7 @@ const mockSalaryRecords = [
     currency: "USD",
     effectiveDate: new Date(2023, 1, 15), // Feb 15, 2023
     type: "annual",
-    status: "active",
+    status: "active"
   },
   {
     id: "3",
@@ -70,7 +70,7 @@ const mockSalaryRecords = [
     currency: "USD",
     effectiveDate: new Date(2023, 5, 1), // June 1, 2023
     type: "annual",
-    status: "active",
+    status: "active"
   },
   {
     id: "4",
@@ -82,7 +82,7 @@ const mockSalaryRecords = [
     currency: "USD",
     effectiveDate: new Date(2023, 2, 10), // March 10, 2023
     type: "annual",
-    status: "active",
+    status: "active"
   },
   {
     id: "5",
@@ -94,7 +94,7 @@ const mockSalaryRecords = [
     currency: "USD",
     effectiveDate: new Date(2023, 7, 1), // Aug 1, 2023
     type: "annual",
-    status: "active",
+    status: "active"
   },
   {
     id: "6",
@@ -106,9 +106,9 @@ const mockSalaryRecords = [
     currency: "USD",
     effectiveDate: new Date(2023, 8, 15), // Sept 15, 2023
     type: "annual",
-    status: "active",
-  },
-];
+    status: "active"
+  }
+]
 
 // Mock employees for dropdown
 const employees = [
@@ -117,23 +117,23 @@ const employees = [
   { id: "3", name: "Michael Brown", department: "Finance" },
   { id: "4", name: "Emily Davis", department: "HR" },
   { id: "5", name: "David Martinez", department: "Engineering" },
-  { id: "6", name: "Jennifer Lee", department: "Operations" },
-];
+  { id: "6", name: "Jennifer Lee", department: "Operations" }
+]
 
 const formSchema = z.object({
   employeeId: z.string().min(1, "Please select an employee"),
   amount: z.string().min(1, "Amount is required"),
   currency: z.string().min(1, "Currency is required"),
   type: z.enum(["monthly", "annual", "hourly"]),
-  effectiveDate: z.string().min(1, "Effective date is required"),
-});
+  effectiveDate: z.string().min(1, "Effective date is required")
+})
 
 const Salary = () => {
-  const [salaryRecords, setSalaryRecords] = useState(mockSalaryRecords);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editRecord, setEditRecord] = useState(null);
-  const { toast } = useToast();
-  
+  const [salaryRecords, setSalaryRecords] = useState(mockSalaryRecords)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editRecord, setEditRecord] = useState(null)
+  const { toast } = useToast()
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -141,42 +141,42 @@ const Salary = () => {
       amount: "",
       currency: "USD",
       type: "annual",
-      effectiveDate: format(new Date(), "yyyy-MM-dd"),
-    },
-  });
-  
+      effectiveDate: format(new Date(), "yyyy-MM-dd")
+    }
+  })
+
   const handleAddSalary = () => {
-    setEditRecord(null);
+    setEditRecord(null)
     form.reset({
       employeeId: "",
       amount: "",
       currency: "USD",
       type: "annual",
-      effectiveDate: format(new Date(), "yyyy-MM-dd"),
-    });
-    setIsDialogOpen(true);
-  };
-  
-  const handleEditSalary = (record) => {
-    setEditRecord(record);
+      effectiveDate: format(new Date(), "yyyy-MM-dd")
+    })
+    setIsDialogOpen(true)
+  }
+
+  const handleEditSalary = record => {
+    setEditRecord(record)
     form.reset({
       employeeId: record.employeeId,
       amount: String(record.amount),
       currency: record.currency,
       type: record.type,
-      effectiveDate: format(record.effectiveDate, "yyyy-MM-dd"),
-    });
-    setIsDialogOpen(true);
-  };
-  
-  const onSubmit = (data) => {
-    const employee = employees.find((emp) => emp.id === data.employeeId);
-    
+      effectiveDate: format(record.effectiveDate, "yyyy-MM-dd")
+    })
+    setIsDialogOpen(true)
+  }
+
+  const onSubmit = data => {
+    const employee = employees.find(emp => emp.id === data.employeeId)
+
     if (employee) {
       if (editRecord) {
         // Update existing record
         setSalaryRecords(
-          salaryRecords.map((record) =>
+          salaryRecords.map(record =>
             record.id === editRecord.id
               ? {
                   ...record,
@@ -185,16 +185,20 @@ const Salary = () => {
                   department: employee.department,
                   amount: Number(data.amount),
                   currency: data.currency,
-                  effectiveDate: parse(data.effectiveDate, "yyyy-MM-dd", new Date()),
-                  type: data.type,
+                  effectiveDate: parse(
+                    data.effectiveDate,
+                    "yyyy-MM-dd",
+                    new Date()
+                  ),
+                  type: data.type
                 }
               : record
           )
-        );
+        )
         toast({
           title: "Salary updated",
-          description: `${employee.name}'s salary has been updated successfully`,
-        });
+          description: `${employee.name}'s salary has been updated successfully`
+        })
       } else {
         // Add new record
         const newRecord = {
@@ -207,18 +211,18 @@ const Salary = () => {
           currency: data.currency,
           effectiveDate: parse(data.effectiveDate, "yyyy-MM-dd", new Date()),
           type: data.type,
-          status: "active",
-        };
-        setSalaryRecords([...salaryRecords, newRecord]);
+          status: "active"
+        }
+        setSalaryRecords([...salaryRecords, newRecord])
         toast({
           title: "Salary added",
-          description: `${employee.name}'s salary has been added successfully`,
-        });
+          description: `${employee.name}'s salary has been added successfully`
+        })
       }
-      setIsDialogOpen(false);
+      setIsDialogOpen(false)
     }
-  };
-  
+  }
+
   return (
     <>
       <Helmet>
@@ -231,13 +235,13 @@ const Salary = () => {
             Manage employee compensation and salary history
           </p>
         </div>
-        
+
         <SalaryTable
           records={salaryRecords}
           onAddSalary={handleAddSalary}
           onEditSalary={handleEditSalary}
         />
-        
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -250,9 +254,12 @@ const Salary = () => {
                   : "Add a new salary record for an employee"}
               </DialogDescription>
             </DialogHeader>
-            
+
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-2">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6 pt-2"
+              >
                 <FormField
                   control={form.control}
                   name="employeeId"
@@ -270,7 +277,7 @@ const Salary = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {employees.map((employee) => (
+                          {employees.map(employee => (
                             <SelectItem key={employee.id} value={employee.id}>
                               {employee.name} - {employee.department}
                             </SelectItem>
@@ -281,7 +288,7 @@ const Salary = () => {
                     </FormItem>
                   )}
                 />
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -302,7 +309,6 @@ const Salary = () => {
                       </FormItem>
                     )}
                   />
-                  
 
                   <FormField
                     control={form.control}
@@ -310,68 +316,82 @@ const Salary = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Currency</FormLabel>
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select currency" />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="USD">USD</SelectItem>
-                              <SelectItem value="EUR">EUR</SelectItem>
-                              <SelectItem value="GBP">GBP</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="USD">USD</SelectItem>
+                            <SelectItem value="EUR">EUR</SelectItem>
+                            <SelectItem value="GBP">GBP</SelectItem>
+                            <SelectItem value="CAD">CAD</SelectItem>
+                            <SelectItem value="AUD">AUD</SelectItem>
+                            <SelectItem value="JPY">JPY</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="annual">Annual</SelectItem>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="hourly">Hourly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="effectiveDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Effective Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Salary Type</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select salary type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                            <SelectItem value="annual">Annual</SelectItem>
-                            <SelectItem value="hourly">Hourly</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="effectiveDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Effective Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
+
                 <DialogFooter>
-                  <Button type="submit">{editRecord ? "Update" : "Add"} Salary</Button>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
                     Cancel
+                  </Button>
+                  <Button type="submit">
+                    {editRecord ? "Update" : "Add"} Record
                   </Button>
                 </DialogFooter>
               </form>
@@ -380,7 +400,7 @@ const Salary = () => {
         </Dialog>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Salary;
+export default Salary

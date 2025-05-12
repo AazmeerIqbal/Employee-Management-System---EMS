@@ -1,34 +1,32 @@
 "use client";
 
-import React, { useState } from "react";
-import { Helmet } from "react-helmet";
-import DepartmentCard from "../../src/components/departments/DepartmentCard";
-import { Input } from "../../src/components/ui/input";
-import { Button } from "../../src/components/ui/button";
-
-
+import React, { useState } from "react"
+import { Helmet } from "react-helmet"
+import DepartmentCard from "../../src/components/departments/DepartmentCard"
+import { Input } from "../../src/components/ui/input"
+import { Button } from "../../src/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "../../src/components/ui/dialog";
+  DialogTitle
+} from "../../src/components/ui/dialog"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "../../src/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Plus, Search } from "lucide-react";
-import { useToast } from "../../src/hooks/use-toast";
-import { Textarea } from "../../src/components/ui/textarea";
+  FormMessage
+} from "../../src/components/ui/form"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Plus, Search } from "lucide-react"
+import { useToast } from "../../src/hooks/use-toast"
+import { Textarea } from "../../src/components/ui/textarea"
 
 // Mock department data
 const mockDepartments = [
@@ -39,7 +37,7 @@ const mockDepartments = [
     employeeCount: 45,
     maxCapacity: 60,
     manager: "Alex Johnson",
-    color: "#3498db",
+    color: "#3498db"
   },
   {
     id: "2",
@@ -48,7 +46,7 @@ const mockDepartments = [
     employeeCount: 25,
     maxCapacity: 30,
     manager: "Sarah Wilson",
-    color: "#e74c3c",
+    color: "#e74c3c"
   },
   {
     id: "3",
@@ -57,7 +55,7 @@ const mockDepartments = [
     employeeCount: 15,
     maxCapacity: 20,
     manager: "Michael Brown",
-    color: "#2ecc71",
+    color: "#2ecc71"
   },
   {
     id: "4",
@@ -66,7 +64,7 @@ const mockDepartments = [
     employeeCount: 10,
     maxCapacity: 15,
     manager: "Emily Davis",
-    color: "#f39c12",
+    color: "#f39c12"
   },
   {
     id: "5",
@@ -75,7 +73,7 @@ const mockDepartments = [
     employeeCount: 20,
     maxCapacity: 30,
     manager: "David Martinez",
-    color: "#9b59b6",
+    color: "#9b59b6"
   },
   {
     id: "6",
@@ -84,42 +82,28 @@ const mockDepartments = [
     employeeCount: 30,
     maxCapacity: 40,
     manager: "Jennifer Lee",
-    color: "#1abc9c",
-  },
-];
+    color: "#1abc9c"
+  }
+]
 
-const formSchema = {
-  name: {
-    type: "string",
-    min: 1,
-    message: "Department name is required",
-  },
-  description: {
-    type: "string",
-    min: 1,
-    message: "Description is required",
-  },
-  manager: {
-    type: "string",
-    optional: true,
-  },
-  maxCapacity: {
-    type: "string",
-    validate: (val) => !isNaN(Number(val)) && Number(val) > 0,
-    message: "Capacity must be a positive number",
-  },
-  color: {
-    type: "string",
-    optional: true,
-  },
-};
+const formSchema = z.object({
+  name: z.string().min(1, "Department name is required"),
+  description: z.string().min(1, "Description is required"),
+  manager: z.string().optional(),
+  maxCapacity: z
+    .string()
+    .refine(val => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Capacity must be a positive number"
+    }),
+  color: z.string().optional()
+})
 
 const Departments = () => {
-  const [departments, setDepartments] = useState(mockDepartments);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editDepartment, setEditDepartment] = useState(null);
-  const { toast } = useToast();
+  const [departments, setDepartments] = useState(mockDepartments)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editDepartment, setEditDepartment] = useState(null)
+  const { toast } = useToast()
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -128,51 +112,51 @@ const Departments = () => {
       description: "",
       manager: "",
       maxCapacity: "20",
-      color: "#3498db",
-    },
-  });
+      color: "#3498db"
+    }
+  })
 
-  const filteredDepartments = departments.filter((dept) =>
+  const filteredDepartments = departments.filter(dept =>
     dept.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  )
 
-  const handleEdit = (department) => {
-    setEditDepartment(department);
+  const handleEdit = department => {
+    setEditDepartment(department)
     form.reset({
       name: department.name,
       description: department.description,
       manager: department.manager || "",
       maxCapacity: String(department.maxCapacity),
-      color: department.color,
-    });
-    setIsDialogOpen(true);
-  };
+      color: department.color
+    })
+    setIsDialogOpen(true)
+  }
 
-  const handleDelete = (departmentId) => {
-    setDepartments(departments.filter((dept) => dept.id !== departmentId));
+  const handleDelete = departmentId => {
+    setDepartments(departments.filter(dept => dept.id !== departmentId))
     toast({
       title: "Department deleted",
-      description: "The department has been removed successfully",
-    });
-  };
+      description: "The department has been removed successfully"
+    })
+  }
 
   const handleAddNew = () => {
-    setEditDepartment(null);
+    setEditDepartment(null)
     form.reset({
       name: "",
       description: "",
       manager: "",
       maxCapacity: "20",
-      color: "#3498db",
-    });
-    setIsDialogOpen(true);
-  };
+      color: "#3498db"
+    })
+    setIsDialogOpen(true)
+  }
 
-  const onSubmit = (data) => {
+  const onSubmit = data => {
     if (editDepartment) {
       // Update existing department
       setDepartments(
-        departments.map((dept) =>
+        departments.map(dept =>
           dept.id === editDepartment.id
             ? {
                 ...dept,
@@ -180,15 +164,15 @@ const Departments = () => {
                 description: data.description,
                 manager: data.manager || null,
                 maxCapacity: Number(data.maxCapacity),
-                color: data.color,
+                color: data.color
               }
             : dept
         )
-      );
+      )
       toast({
         title: "Department updated",
-        description: "The department has been updated successfully",
-      });
+        description: "The department has been updated successfully"
+      })
     } else {
       // Add new department
       const newDepartment = {
@@ -198,16 +182,16 @@ const Departments = () => {
         employeeCount: 0,
         maxCapacity: Number(data.maxCapacity),
         manager: data.manager || null,
-        color: data.color,
-      };
-      setDepartments([...departments, newDepartment]);
+        color: data.color
+      }
+      setDepartments([...departments, newDepartment])
       toast({
         title: "Department added",
-        description: "The department has been added successfully",
-      });
+        description: "The department has been added successfully"
+      })
     }
-    setIsDialogOpen(false);
-  };
+    setIsDialogOpen(false)
+  }
 
   return (
     <>
@@ -217,7 +201,7 @@ const Departments = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
-          <p className="text-muted-foreground ">
+          <p className="text-muted-foreground">
             Manage your organization's departments
           </p>
         </div>
@@ -228,7 +212,7 @@ const Departments = () => {
             <Input
               placeholder="Search departments..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -243,7 +227,7 @@ const Departments = () => {
               No departments found
             </div>
           ) : (
-            filteredDepartments.map((department) => (
+            filteredDepartments.map(department => (
               <DepartmentCard
                 key={department.id}
                 department={department}
@@ -375,7 +359,7 @@ const Departments = () => {
         </DialogContent>
       </Dialog>
     </>
-  );
-};
+  )
+}
 
-export default Departments;
+export default Departments

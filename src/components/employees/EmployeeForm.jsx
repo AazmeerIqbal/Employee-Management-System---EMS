@@ -259,7 +259,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
                 <FormLabel
                   htmlFor="image-upload"
-                  className="cursor-pointer bg-secondary hover:bg-secondary/80 text-secondary-foreground py-2 px-4 rounded-md flex items-center space-x-2"
+                  className="cursor-pointer bg-secondary hover:bg-[hsl(var(--secondary)/0.8)] text-secondary-foreground py-2 px-4 rounded-md flex items-center space-x-2"
                 >
                   <Upload size={16} />
                   <span>{imagePreview ? "Change Image" : "Upload Image"}</span>

@@ -15,7 +15,7 @@ const RecentEmployees = ({ employees }) => {
             {employees.map((employee) => (
               <div
                 key={employee.id}
-                className="flex items-center justify-between py-3 px-6 hover:bg-muted/30 transition-colors"
+                className="flex items-center justify-between py-3 px-6 hover:bg-[hsl(var(--muted)/0.3)] transition-colors"
               >
                 <div className="flex items-center space-x-3">
                   <Avatar>

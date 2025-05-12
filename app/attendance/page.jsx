@@ -1,37 +1,37 @@
-"use client"
+"use client";
 
-import React, { useState } from "react";
-import { Helmet } from "react-helmet";
-import AttendanceTable from "../../src/components/attendance/AttendanceTable";
+import React, { useState } from "react"
+import { Helmet } from "react-helmet"
+import AttendanceTable from "../../src/components/attendance/AttendanceTable"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "../../src/components/ui/dialog";
-import { Button } from "../../src/components/ui/button";
-import { Calendar } from "../../src/components/ui/calendar";
+  DialogTitle
+} from "../../src/components/ui/dialog"
+import { Button } from "../../src/components/ui/button"
+import { Calendar } from "../../src/components/ui/calendar"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "../../src/components/ui/select";
-import { useToast } from "../../src/hooks/use-toast";
+  SelectValue
+} from "../../src/components/ui/select"
+import { useToast } from "../../src/hooks/use-toast"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-} from "../../src/components/ui/form";
-import { useForm } from "react-hook-form";
-import { Input } from "../../src/components/ui/input";
-import { CalendarClock } from "lucide-react";
-import { format } from "date-fns";
+  FormLabel
+} from "../../src/components/ui/form"
+import { useForm } from "react-hook-form"
+import { Input } from "../../src/components/ui/input"
+import { CalendarClock } from "lucide-react"
+import { format } from "date-fns"
 
 // Mock attendance data
 const mockAttendanceRecords = [
@@ -43,7 +43,7 @@ const mockAttendanceRecords = [
     date: new Date(),
     status: "present",
     checkInTime: "09:00 AM",
-    checkOutTime: "05:30 PM",
+    checkOutTime: "05:30 PM"
   },
   {
     id: "2",
@@ -53,7 +53,7 @@ const mockAttendanceRecords = [
     date: new Date(),
     status: "present",
     checkInTime: "08:45 AM",
-    checkOutTime: "05:15 PM",
+    checkOutTime: "05:15 PM"
   },
   {
     id: "3",
@@ -63,7 +63,7 @@ const mockAttendanceRecords = [
     date: new Date(),
     status: "absent",
     checkInTime: "",
-    checkOutTime: "",
+    checkOutTime: ""
   },
   {
     id: "4",
@@ -73,7 +73,7 @@ const mockAttendanceRecords = [
     date: new Date(),
     status: "late",
     checkInTime: "10:15 AM",
-    checkOutTime: "06:00 PM",
+    checkOutTime: "06:00 PM"
   },
   {
     id: "5",
@@ -83,7 +83,7 @@ const mockAttendanceRecords = [
     date: new Date(),
     status: "present",
     checkInTime: "09:05 AM",
-    checkOutTime: "05:45 PM",
+    checkOutTime: "05:45 PM"
   },
   {
     id: "6",
@@ -93,9 +93,9 @@ const mockAttendanceRecords = [
     date: new Date(),
     status: "half-day",
     checkInTime: "09:00 AM",
-    checkOutTime: "01:30 PM",
-  },
-];
+    checkOutTime: "01:30 PM"
+  }
+]
 
 const employees = [
   { id: "1", name: "Alex Johnson", department: "Engineering" },
@@ -103,29 +103,35 @@ const employees = [
   { id: "3", name: "Michael Brown", department: "Finance" },
   { id: "4", name: "Emily Davis", department: "HR" },
   { id: "5", name: "David Martinez", department: "Engineering" },
-  { id: "6", name: "Jennifer Lee", department: "Operations" },
-];
+  { id: "6", name: "Jennifer Lee", department: "Operations" }
+]
 
 const Attendance = () => {
-  const [attendanceRecords, setAttendanceRecords] = useState(mockAttendanceRecords);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
-  const [date, setDate] = useState(new Date());
+  const [attendanceRecords, setAttendanceRecords] = useState(
+    mockAttendanceRecords
+  )
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { toast } = useToast()
+  const [date, setDate] = useState(new Date())
 
   const form = useForm({
     defaultValues: {
       employeeId: "",
       status: "present",
       checkInTime: "",
-      checkOutTime: "",
-    },
-  });
+      checkOutTime: ""
+    }
+  })
 
-  const onSubmit = (data) => {
-    const newId = `${attendanceRecords.length + 1}`;
-    const employee = employees.find((emp) => emp.id === data.employeeId);
+  const onSubmit = data => {
+    // Generate a new ID for the record
+    const newId = `${attendanceRecords.length + 1}`
+
+    // Find the employee details
+    const employee = employees.find(emp => emp.id === data.employeeId)
 
     if (employee) {
+      // Create a new attendance record
       const newRecord = {
         id: newId,
         employeeId: data.employeeId,
@@ -134,20 +140,25 @@ const Attendance = () => {
         date: date,
         status: data.status,
         checkInTime: data.checkInTime || "",
-        checkOutTime: data.checkOutTime || "",
-      };
+        checkOutTime: data.checkOutTime || ""
+      }
 
-      setAttendanceRecords([...attendanceRecords, newRecord]);
+      // Add the new record to the state
+      setAttendanceRecords([...attendanceRecords, newRecord])
 
+      // Show a success toast notification
       toast({
         title: "Attendance recorded",
-        description: `${employee.name}'s attendance has been recorded for ${format(date, "MMM dd, yyyy")}`,
-      });
+        description: `${
+          employee.name
+        }'s attendance has been recorded for ${format(date, "MMM dd, yyyy")}`
+      })
 
-      form.reset();
-      setIsDialogOpen(false);
+      // Reset the form and close the dialog
+      form.reset()
+      setIsDialogOpen(false)
     }
-  };
+  }
 
   return (
     <>
@@ -188,7 +199,10 @@ const Attendance = () => {
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6 pt-4"
+              >
                 <div className="grid gap-6">
                   <FormField
                     control={form.control}
@@ -206,7 +220,7 @@ const Attendance = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {employees.map((employee) => (
+                            {employees.map(employee => (
                               <SelectItem key={employee.id} value={employee.id}>
                                 {employee.name} - {employee.department}
                               </SelectItem>
@@ -222,7 +236,7 @@ const Attendance = () => {
                     <Calendar
                       mode="single"
                       selected={date}
-                      onSelect={(d) => d && setDate(d)}
+                      onSelect={date => date && setDate(date)}
                       className="border rounded-md"
                     />
                   </div>
@@ -267,6 +281,7 @@ const Attendance = () => {
                           </FormItem>
                         )}
                       />
+
                       <FormField
                         control={form.control}
                         name="checkOutTime"
@@ -299,7 +314,7 @@ const Attendance = () => {
         </Dialog>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Attendance;
+export default Attendance

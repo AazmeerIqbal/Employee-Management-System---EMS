@@ -1,24 +1,30 @@
-"use client"
+"use client";
 
-import React, { useState } from "react";
-import { Helmet } from "react-helmet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../src/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../src/components/ui/card";
-import { Switch } from "../../src/components/ui/switch";
-import { Button } from "../../src/components/ui/button";
-import { Input } from "../../src/components/ui/input";
-import { Label } from "../../src/components/ui/label";
-import { Badge } from "../../src/components/ui/badge";
-import { useToast } from "../../src/hooks/use-toast";
-import { Check, Pencil, Save, Trash2, X } from "lucide-react";
+import React, { useState } from "react"
+import { Helmet } from "react-helmet"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../src/components/ui/tabs"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "../../src/components/ui/card"
+import { Switch } from "../../src/components/ui/switch"
+import { Button } from "../../src/components/ui/button"
+import { Input } from "../../src/components/ui/input"
+import { Label } from "../../src/components/ui/label"
+import { Badge } from "../../src/components/ui/badge"
+import { useToast } from "../../src/hooks/use-toast"
+import { Check, Pencil, Trash2, X } from "lucide-react"
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "../../src/components/ui/table";
+  TableRow
+} from "../../src/components/ui/table"
 
 // Mock roles data
 const mockRoles = [
@@ -39,10 +45,10 @@ const mockRoles = [
       "manage_reports",
       "view_settings",
       "manage_settings",
-      "view_calendar",
+      "view_calendar"
     ],
     userCount: 1,
-    editable: false,
+    editable: false
   },
   {
     id: "2",
@@ -56,10 +62,10 @@ const mockRoles = [
       "view_departments",
       "view_salary",
       "view_reports",
-      "view_calendar",
+      "view_calendar"
     ],
     userCount: 3,
-    editable: true,
+    editable: true
   },
   {
     id: "3",
@@ -69,10 +75,10 @@ const mockRoles = [
       "view_employees",
       "view_salary",
       "manage_salary",
-      "view_reports",
+      "view_reports"
     ],
     userCount: 2,
-    editable: true,
+    editable: true
   },
   {
     id: "4",
@@ -82,76 +88,131 @@ const mockRoles = [
       "view_employees",
       "view_attendance",
       "manage_attendance",
-      "view_calendar",
+      "view_calendar"
     ],
     userCount: 5,
-    editable: true,
-  },
-];
+    editable: true
+  }
+]
 
 // Available permissions
 const availablePermissions = [
-  { id: "view_dashboard", name: "View Dashboard", description: "Access to view dashboard" },
-  { id: "view_employees", name: "View Employees", description: "Access to view employee list" },
-  { id: "manage_employees", name: "Manage Employees", description: "Add, edit, delete employees" },
-  { id: "view_attendance", name: "View Attendance", description: "Access to view attendance records" },
-  { id: "manage_attendance", name: "Manage Attendance", description: "Record and modify attendance" },
-  { id: "view_salary", name: "View Salary", description: "Access to view salary information" },
-  { id: "manage_salary", name: "Manage Salary", description: "Add and update salary records" },
-  { id: "view_departments", name: "View Departments", description: "Access to view department list" },
-  { id: "manage_departments", name: "Manage Departments", description: "Add, edit, delete departments" },
-  { id: "view_reports", name: "View Reports", description: "Access to view reports" },
-  { id: "manage_reports", name: "Manage Reports", description: "Create and configure reports" },
-  { id: "view_settings", name: "View Settings", description: "Access to view system settings" },
-  { id: "manage_settings", name: "Manage Settings", description: "Modify system settings" },
-  { id: "view_calendar", name: "View Calendar", description: "Access to view calendar" },
-];
+  {
+    id: "view_dashboard",
+    name: "View Dashboard",
+    description: "Access to view dashboard"
+  },
+  {
+    id: "view_employees",
+    name: "View Employees",
+    description: "Access to view employee list"
+  },
+  {
+    id: "manage_employees",
+    name: "Manage Employees",
+    description: "Add, edit, delete employees"
+  },
+  {
+    id: "view_attendance",
+    name: "View Attendance",
+    description: "Access to view attendance records"
+  },
+  {
+    id: "manage_attendance",
+    name: "Manage Attendance",
+    description: "Record and modify attendance"
+  },
+  {
+    id: "view_salary",
+    name: "View Salary",
+    description: "Access to view salary information"
+  },
+  {
+    id: "manage_salary",
+    name: "Manage Salary",
+    description: "Add and update salary records"
+  },
+  {
+    id: "view_departments",
+    name: "View Departments",
+    description: "Access to view department list"
+  },
+  {
+    id: "manage_departments",
+    name: "Manage Departments",
+    description: "Add, edit, delete departments"
+  },
+  {
+    id: "view_reports",
+    name: "View Reports",
+    description: "Access to view reports"
+  },
+  {
+    id: "manage_reports",
+    name: "Manage Reports",
+    description: "Create and configure reports"
+  },
+  {
+    id: "view_settings",
+    name: "View Settings",
+    description: "Access to view system settings"
+  },
+  {
+    id: "manage_settings",
+    name: "Manage Settings",
+    description: "Modify system settings"
+  },
+  {
+    id: "view_calendar",
+    name: "View Calendar",
+    description: "Access to view calendar"
+  }
+]
 
 const Settings = () => {
-    const [roles, setRoles] = useState(mockRoles);
-    const [editingRoleId, setEditingRoleId] = useState(null);
-    const [newRoleName, setNewRoleName] = useState("");
-    const [rolePermissions, setRolePermissions] = useState([]);
-    const [newRoleMode, setNewRoleMode] = useState(false);
-    const { toast } = useToast();
-    
-    const handleEditRole = (role) => {
-      setEditingRoleId(role.id);
-      setNewRoleName(role.name);
-      setRolePermissions([...role.permissions]);
-      setNewRoleMode(false);
-    };
-    
-    const handleTogglePermission = (permissionId) => {
-      setRolePermissions((prev) => {
-        if (prev.includes(permissionId)) {
-          return prev.filter((p) => p !== permissionId);
-        } else {
-          return [...prev, permissionId];
-        }
-      });
-    };
-    
-  
+  const [roles, setRoles] = useState(mockRoles)
+  const [editingRoleId, setEditingRoleId] = useState(null)
+  const [newRoleName, setNewRoleName] = useState("")
+  const [rolePermissions, setRolePermissions] = useState([])
+  const [newRoleMode, setNewRoleMode] = useState(false)
+  const { toast } = useToast()
+
+  const handleEditRole = role => {
+    setEditingRoleId(role.id)
+    setNewRoleName(role.name)
+    setRolePermissions([...role.permissions])
+    setNewRoleMode(false)
+  }
+
+  const handleTogglePermission = permissionId => {
+    setRolePermissions(prev => {
+      if (prev.includes(permissionId)) {
+        return prev.filter(p => p !== permissionId)
+      } else {
+        return [...prev, permissionId]
+      }
+    })
+  }
+
   const handleSaveRole = () => {
     if (!newRoleName.trim()) {
       toast({
         title: "Error",
         description: "Role name cannot be empty",
-        variant: "destructive",
-      });
-      return;
+        variant: "destructive"
+      })
+      return
     }
-    
+
     if (rolePermissions.length === 0) {
       toast({
         title: "Error",
         description: "Role must have at least one permission",
-        variant: "destructive",
-      });
-      return;
+        variant: "destructive"
+      })
+      return
     }
-    
+
     if (newRoleMode) {
       // Add new role
       const newRole = {
@@ -159,66 +220,66 @@ const Settings = () => {
         name: newRoleName,
         permissions: rolePermissions,
         userCount: 0,
-        editable: true,
-      };
-      setRoles([...roles, newRole]);
+        editable: true
+      }
+      setRoles([...roles, newRole])
       toast({
         title: "Success",
-        description: `Role "${newRoleName}" has been created`,
-      });
+        description: `Role "${newRoleName}" has been created`
+      })
     } else {
       // Update existing role
       setRoles(
-        roles.map((role) =>
+        roles.map(role =>
           role.id === editingRoleId
             ? { ...role, name: newRoleName, permissions: rolePermissions }
             : role
         )
-      );
+      )
       toast({
         title: "Success",
-        description: `Role "${newRoleName}" has been updated`,
-      });
+        description: `Role "${newRoleName}" has been updated`
+      })
     }
-    
-    setEditingRoleId(null);
-    setNewRoleName("");
-    setRolePermissions([]);
-    setNewRoleMode(false);
-  };
-  
+
+    setEditingRoleId(null)
+    setNewRoleName("")
+    setRolePermissions([])
+    setNewRoleMode(false)
+  }
+
   const handleCancelEdit = () => {
-    setEditingRoleId(null);
-    setNewRoleName("");
-    setRolePermissions([]);
-    setNewRoleMode(false);
-  };
-  
-  const handleDeleteRole = (roleId) => {
-    const roleToDelete = roles.find((role) => role.id === roleId);
+    setEditingRoleId(null)
+    setNewRoleName("")
+    setRolePermissions([])
+    setNewRoleMode(false)
+  }
+
+  const handleDeleteRole = roleId => {
+    const roleToDelete = roles.find(role => role.id === roleId)
     if (roleToDelete && roleToDelete.userCount > 0) {
       toast({
         title: "Cannot delete",
         description: `Role "${roleToDelete.name}" has ${roleToDelete.userCount} assigned users`,
-        variant: "destructive",
-      });
-      return;
+        variant: "destructive"
+      })
+      return
     }
-    
-    setRoles(roles.filter((role) => role.id !== roleId));
+
+    setRoles(roles.filter(role => role.id !== roleId))
     toast({
       title: "Success",
-      description: "Role has been deleted",
-    });
-  };
-  
+      description: "Role has been deleted"
+    })
+  }
+
   const handleStartNewRole = () => {
-    setNewRoleMode(true);
-    setEditingRoleId(null);
-    setNewRoleName("");
-    setRolePermissions([]);
-  };
-  
+    setNewRoleMode(true)
+    setEditingRoleId(null)
+    setNewRoleName("")
+    setRolePermissions([])
+  }
+
   return (
     <>
       <Helmet>
@@ -231,14 +292,14 @@ const Settings = () => {
             Configure your application settings and user permissions
           </p>
         </div>
-        
+
         <Tabs defaultValue="roles">
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="roles">Roles & Permissions</TabsTrigger>
             <TabsTrigger value="company">Company Settings</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="roles" className="space-y-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
@@ -248,28 +309,30 @@ const Settings = () => {
                     Manage user roles and their permissions
                   </CardDescription>
                 </div>
-                <Button onClick={handleStartNewRole}>
-                  Add New Role
-                </Button>
+                <Button onClick={handleStartNewRole}>Add New Role</Button>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Role Name</TableHead>
-                      <TableHead className="hidden md:table-cell">Access Level</TableHead>
-                      <TableHead className="hidden lg:table-cell">Users</TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Access Level
+                      </TableHead>
+                      <TableHead className="hidden lg:table-cell">
+                        Users
+                      </TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {roles.map((role) => (
+                    {roles.map(role => (
                       <TableRow key={role.id}>
                         <TableCell>
                           {editingRoleId === role.id ? (
                             <Input
                               value={newRoleName}
-                              onChange={(e) => setNewRoleName(e.target.value)}
+                              onChange={e => setNewRoleName(e.target.value)}
                             />
                           ) : (
                             <div className="font-medium">{role.name}</div>
@@ -278,14 +341,16 @@ const Settings = () => {
                         <TableCell className="hidden md:table-cell">
                           {editingRoleId === role.id ? (
                             <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                              {availablePermissions.map((permission) => (
+                              {availablePermissions.map(permission => (
                                 <div
                                   key={permission.id}
                                   className="flex items-center space-x-2"
                                 >
                                   <Switch
                                     id={`${role.id}-${permission.id}`}
-                                    checked={rolePermissions.includes(permission.id)}
+                                    checked={rolePermissions.includes(
+                                      permission.id
+                                    )}
                                     onCheckedChange={() =>
                                       handleTogglePermission(permission.id)
                                     }
@@ -303,29 +368,31 @@ const Settings = () => {
                             <div className="flex flex-wrap gap-1">
                               {role.permissions.length > 3 ? (
                                 <>
-                                  {role.permissions.slice(0, 3).map((permissionId) => {
-                                    const permission = availablePermissions.find(
-                                      (p) => p.id === permissionId
-                                    );
-                                    return (
-                                      <Badge
-                                        key={permissionId}
-                                        variant="outline"
-                                        className="mr-1 mb-1"
-                                      >
-                                        {permission?.name}
-                                      </Badge>
-                                    );
-                                  })}
+                                  {role.permissions
+                                    .slice(0, 3)
+                                    .map(permissionId => {
+                                      const permission = availablePermissions.find(
+                                        p => p.id === permissionId
+                                      )
+                                      return (
+                                        <Badge
+                                          key={permissionId}
+                                          variant="outline"
+                                          className="mr-1 mb-1"
+                                        >
+                                          {permission?.name}
+                                        </Badge>
+                                      )
+                                    })}
                                   <Badge variant="outline">
                                     +{role.permissions.length - 3} more
                                   </Badge>
                                 </>
                               ) : (
-                                role.permissions.map((permissionId) => {
+                                role.permissions.map(permissionId => {
                                   const permission = availablePermissions.find(
-                                    (p) => p.id === permissionId
-                                  );
+                                    p => p.id === permissionId
+                                  )
                                   return (
                                     <Badge
                                       key={permissionId}
@@ -334,7 +401,7 @@ const Settings = () => {
                                     >
                                       {permission?.name}
                                     </Badge>
-                                  );
+                                  )
                                 })
                               )}
                             </div>
@@ -346,10 +413,7 @@ const Settings = () => {
                         <TableCell className="text-right">
                           {editingRoleId === role.id ? (
                             <div className="flex justify-end space-x-2">
-                              <Button
-                                size="icon"
-                                onClick={handleSaveRole}
-                              >
+                              <Button size="icon" onClick={handleSaveRole}>
                                 <Check className="h-4 w-4" />
                               </Button>
                               <Button
@@ -391,19 +455,21 @@ const Settings = () => {
                           <Input
                             placeholder="Enter role name"
                             value={newRoleName}
-                            onChange={(e) => setNewRoleName(e.target.value)}
+                            onChange={e => setNewRoleName(e.target.value)}
                           />
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                            {availablePermissions.map((permission) => (
+                            {availablePermissions.map(permission => (
                               <div
                                 key={permission.id}
                                 className="flex items-center space-x-2"
                               >
                                 <Switch
                                   id={`new-${permission.id}`}
-                                  checked={rolePermissions.includes(permission.id)}
+                                  checked={rolePermissions.includes(
+                                    permission.id
+                                  )}
                                   onCheckedChange={() =>
                                     handleTogglePermission(permission.id)
                                   }
@@ -423,10 +489,7 @@ const Settings = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
-                            <Button
-                              size="icon"
-                              onClick={handleSaveRole}
-                            >
+                            <Button size="icon" onClick={handleSaveRole}>
                               <Check className="h-4 w-4" />
                             </Button>
                             <Button
@@ -445,7 +508,7 @@ const Settings = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="company">
             <Card>
               <CardHeader>
@@ -458,7 +521,10 @@ const Settings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="company-name">Company Name</Label>
-                    <Input id="company-name" defaultValue="Aura Technology Inc." />
+                    <Input
+                      id="company-name"
+                      defaultValue="Aura Technology Inc."
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company-email">Email Address</Label>
@@ -466,11 +532,17 @@ const Settings = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company-phone">Phone Number</Label>
-                    <Input id="company-phone" defaultValue="+1 (555) 123-4567" />
+                    <Input
+                      id="company-phone"
+                      defaultValue="+1 (555) 123-4567"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company-address">Address</Label>
-                    <Input id="company-address" defaultValue="123 Innovation Street" />
+                    <Input
+                      id="company-address"
+                      defaultValue="123 Innovation Street"
+                    />
                   </div>
                 </div>
                 <div className="pt-4 flex justify-end">
@@ -479,7 +551,7 @@ const Settings = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="security">
             <Card>
               <CardHeader>
@@ -492,7 +564,9 @@ const Settings = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">Two-factor Authentication</div>
+                      <div className="font-medium">
+                        Two-factor Authentication
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         Require 2FA for all admin users
                       </div>
@@ -521,7 +595,8 @@ const Settings = () => {
                     <div>
                       <div className="font-medium">Session Timeout</div>
                       <div className="text-sm text-muted-foreground">
-                        Automatically log out users after 30 minutes of inactivity
+                        Automatically log out users after 30 minutes of
+                        inactivity
                       </div>
                     </div>
                     <Switch />
@@ -536,7 +611,7 @@ const Settings = () => {
         </Tabs>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Settings;
+export default Settings

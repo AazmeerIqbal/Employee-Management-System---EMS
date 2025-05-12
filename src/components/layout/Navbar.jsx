@@ -15,7 +15,7 @@ const Navbar = () => {
           <input
             type="text"
             placeholder="Search..."
-            className="pl-10 py-2 pr-4 rounded-full bg-secondary/60 focus:outline-none focus:ring-1 focus:ring-ring w-[200px] md:w-[300px]"
+            className="pl-10 py-2 pr-4 rounded-full  bg-[hsl(var(--secondary)/0.6)] focus:outline-none focus:ring-1  focus:ring-[hsl(var(--ring))] w-[200px] md:w-[300px]"
           />
         </div>
       </div>

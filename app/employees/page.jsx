@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import React, { useState } from "react";
-import { Helmet } from "react-helmet";
-import EmployeeTable from "../../src/components/employees/EmployeeTable";
-import EmployeeForm from "../../src/components/employees/EmployeeForm";
-import { Button } from "../../src/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useToast } from "../../src/hooks/use-toast";
+import React, { useState } from "react"
+import { Helmet } from "react-helmet"
+import EmployeeTable from "../../src/components/employees/EmployeeTable"
+import EmployeeForm from "../../src/components/employees/EmployeeForm"
+import { Button } from "../../src/components/ui/button"
+import { ArrowLeft } from "lucide-react"
+import { useToast } from "../../src/hooks/use-toast"
 
 // Mock employee data
 const mockEmployees = [
@@ -18,7 +18,7 @@ const mockEmployees = [
     role: "Frontend Developer",
     status: "active",
     joinedDate: "April 12, 2023",
-    image: "",
+    image: ""
   },
   {
     id: "2",
@@ -28,7 +28,7 @@ const mockEmployees = [
     role: "Marketing Specialist",
     status: "active",
     joinedDate: "January 5, 2023",
-    image: "",
+    image: ""
   },
   {
     id: "3",
@@ -38,7 +38,7 @@ const mockEmployees = [
     role: "Financial Analyst",
     status: "inactive",
     joinedDate: "June 18, 2022",
-    image: "",
+    image: ""
   },
   {
     id: "4",
@@ -48,7 +48,7 @@ const mockEmployees = [
     role: "HR Specialist",
     status: "on-leave",
     joinedDate: "March 10, 2022",
-    image: "",
+    image: ""
   },
   {
     id: "5",
@@ -58,7 +58,7 @@ const mockEmployees = [
     role: "Backend Developer",
     status: "active",
     joinedDate: "August 22, 2023",
-    image: "",
+    image: ""
   },
   {
     id: "6",
@@ -68,47 +68,47 @@ const mockEmployees = [
     role: "Operations Manager",
     status: "active",
     joinedDate: "September 15, 2023",
-    image: "",
-  },
-];
+    image: ""
+  }
+]
 
 const Employees = () => {
-  const [employees, setEmployees] = useState(mockEmployees);
-  const [currentView, setCurrentView] = useState("list");
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  
-  const handleViewEmployee = (employee) => {
-    setSelectedEmployee(employee);
-    setCurrentView("view");
-  };
-  
-  const handleEditEmployee = (employee) => {
-    setSelectedEmployee(employee);
-    setCurrentView("edit");
-  };
-  
-  const handleDeleteEmployee = (employeeId) => {
+  const [employees, setEmployees] = useState(mockEmployees)
+  const [currentView, setCurrentView] = useState("list")
+  const [selectedEmployee, setSelectedEmployee] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
+
+  const handleViewEmployee = employee => {
+    setSelectedEmployee(employee)
+    setCurrentView("view")
+  }
+
+  const handleEditEmployee = employee => {
+    setSelectedEmployee(employee)
+    setCurrentView("edit")
+  }
+
+  const handleDeleteEmployee = employeeId => {
     // In a real app, you would make an API call
     // For now, we just filter the employee out of our state
-    setEmployees(employees.filter((emp) => emp.id !== employeeId));
+    setEmployees(employees.filter(emp => emp.id !== employeeId))
     toast({
       title: "Employee deleted",
-      description: "The employee has been removed successfully",
-    });
-  };
-  
+      description: "The employee has been removed successfully"
+    })
+  }
+
   const handleAddNew = () => {
-    setSelectedEmployee(null);
-    setCurrentView("add");
-  };
-  
-  const handleSubmit = async (data) => {
-    setIsSubmitting(true);
+    setSelectedEmployee(null)
+    setCurrentView("add")
+  }
+
+  const handleSubmit = async data => {
+    setIsSubmitting(true)
     // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
     if (currentView === "add") {
       // Generate a random ID (in a real app, the backend would do this)
       const newEmployee = {
@@ -120,38 +120,40 @@ const Employees = () => {
         department: data.department || "",
         joinedDate: data.joinedDate || new Date().toLocaleDateString(),
         image: data.image || "",
-        name: data.name || "",
-      };
-      setEmployees([...employees, newEmployee]);
+        name: data.name || ""
+      }
+      setEmployees([...employees, newEmployee])
       toast({
         title: "Employee added",
-        description: "The employee has been added successfully",
-      });
+        description: "The employee has been added successfully"
+      })
     } else if (currentView === "edit" && selectedEmployee) {
       setEmployees(
-        employees.map((emp) =>
-          emp.id === selectedEmployee.id ? { 
-            ...emp, 
-            ...data, 
-            status: data.status || emp.status 
-          } : emp
+        employees.map(emp =>
+          emp.id === selectedEmployee.id
+            ? {
+                ...emp,
+                ...data,
+                status: data.status || emp.status
+              }
+            : emp
         )
-      );
+      )
       toast({
         title: "Employee updated",
-        description: "The employee has been updated successfully",
-      });
+        description: "The employee has been updated successfully"
+      })
     }
-    
-    setIsSubmitting(false);
-    setCurrentView("list");
-  };
-  
+
+    setIsSubmitting(false)
+    setCurrentView("list")
+  }
+
   const goBack = () => {
-    setCurrentView("list");
-    setSelectedEmployee(null);
-  };
-  
+    setCurrentView("list")
+    setSelectedEmployee(null)
+  }
+
   return (
     <>
       <Helmet>
@@ -208,7 +210,7 @@ const Employees = () => {
         )}
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Employees;
+export default Employees
