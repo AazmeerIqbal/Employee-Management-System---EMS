@@ -1,31 +1,27 @@
-"use client";
-import { Geist, Geist_Mono } from "next/font/google";
-import { AuthProvider } from "../src/hooks/useAuth";
-import "./globals.css";
+'use client';
 
-import Sidebar from "../src/components/layout/Sidebar";
-import Navbar from "../src/components/layout/Navbar";
-import { usePathname } from "next/navigation";
+import { Geist, Geist_Mono } from 'next/font/google';
+import { AuthProvider } from '../src/hooks/useAuth';
+import './globals.css';
 
+import Sidebar from '../src/components/layout/Sidebar';
+import Navbar from '../src/components/layout/Navbar';
+import { usePathname } from 'next/navigation';
+import { Toaster } from '../src/components/ui/toaster';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
-
-// export const metadata = {
-//   title: "Employee Management System",
-//   description: "",
-// };
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-  const isLoginPage = pathname === "/login" || pathname === "/signup";
+  const isLoginPage = pathname === '/login' || pathname === '/signup';
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -45,9 +41,11 @@ export default function RootLayout({ children }) {
               </div>
             </div>
           )}
+
+   
+          <Toaster />
         </AuthProvider>
       </body>
     </html>
   );
 }
-
