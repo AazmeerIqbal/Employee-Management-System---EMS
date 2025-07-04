@@ -34,13 +34,7 @@ import {
   SelectValue,
 } from "../ui/select";
 
-const EmployeeTable = ({
-  employees,
-  onView,
-  onEdit,
-  onDelete,
-  onAddNew,
-}) => {
+const EmployeeTable = ({ employees, onView, onEdit, onDelete, onAddNew }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
 
@@ -60,6 +54,7 @@ const EmployeeTable = ({
       departmentFilter === "all" || employee.department === departmentFilter;
 
     return matchesSearch && matchesDepartment;
+
   });
 
   const getStatusBadgeStyle = (status) => {
@@ -74,6 +69,7 @@ const EmployeeTable = ({
         return "bg-gray-100 text-gray-800 hover:bg-gray-200";
     }
   };
+
 
   return (
     <div className="space-y-4">
@@ -111,17 +107,28 @@ const EmployeeTable = ({
           <TableHeader>
             <TableRow>
               <TableHead>Employee</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead className="hidden sm:table-cell">Department</TableHead>
-              <TableHead className="hidden lg:table-cell">Joined</TableHead>
-              <TableHead className="hidden sm:table-cell">Status</TableHead>
+              <TableHead className="hidden md:table-cell">Unit</TableHead>
+              <TableHead className="hidden sm:table-cell">
+                Main Department
+              </TableHead>
+              <TableHead className="hidden lg:table-cell">
+                Sub Department
+              </TableHead>
+              <TableHead className="hidden sm:table-cell">
+                CNIC/Form B#
+              </TableHead>
+              <TableHead className="hidden sm:table-cell">Cell #</TableHead>
+              <TableHead className="hidden sm:table-cell">DOB</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredEmployees.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-8 text-muted-foreground"
+                >
                   No employees found
                 </TableCell>
               </TableRow>
@@ -164,8 +171,10 @@ const EmployeeTable = ({
                       variant="outline"
                       className={getStatusBadgeStyle(employee.status)}
                     >
-                      {employee.status === "on-leave" ? "On Leave" :
-                        employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
+                      {employee.status === "on-leave"
+                        ? "On Leave"
+                        : employee.status.charAt(0).toUpperCase() +
+                          employee.status.slice(1)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -218,8 +227,8 @@ const EmployeeTable = ({
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing <b>{filteredEmployees.length}</b> of{" "}
-          <b>{employees.length}</b> employees
+          Showing <b>{filteredEmployees.length}</b> of <b>{employees.length}</b>{" "}
+          employees
         </p>
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="icon" disabled>
