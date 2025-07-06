@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectToDB, closeConnection } from "@/utils/database"; // Adjust this path
-import { encrypt } from "@/utils/Encryption";
+import { connectToDB, closeConnection } from "../../../../utils/database";
+import { encrypt } from "../../../../utils/Encryption";
 
 const sql = require("mssql");
 
@@ -19,87 +19,51 @@ export const authOptions = {
         },
       },
       async authorize(credentials) {
-        const { username, cnic, password, isAdmin } = credentials;
+        const { username, password } = credentials;
 
         let pool;
         try {
           // Connect to the database
           pool = await connectToDB();
-          console.log("CNIC:", cnic, "isAdmin:", isAdmin);
 
           // Encrypt password
           const encryptedPassword = encrypt(password);
 
-          if (isAdmin === "true" || isAdmin === true) {
-            let query = `
-            SELECT * FROM Users 
+          let query = `
+            SELECT * FROM User_mst 
             WHERE UserName = @username 
-            AND Password = @password
-          `;
-            const result = await pool
-              .request()
-              .input("username", sql.VarChar, username)
-              .input("password", sql.VarChar, encryptedPassword)
-              .query(query);
-
-            // Check if user exists
-            if (result.recordset.length > 0) {
-              const user = result.recordset[0];
-              console.log("Authenticated User:", user);
-              return {
-                id: user.UserId,
-                name: user.UserName,
-                firstName: user.FirstName,
-                lastName: user.LastName,
-                cnic: user.CNICNo,
-                email: user.Email,
-                gender: user.Gender,
-                companyId: user.CompanyId,
-                roleId: user.RoleId,
-                imagePath: user.ImagePath,
-                isAdmin: user.IsAdmin,
-                memberId: user.MemberId,
-                memberShipNo: user.MemberShipNo,
-              }; // Return user object for session
-            } else {
-              throw new Error("Invalid username or password");
-            }
-          } else {
-            let query = `
-            SELECT * FROM Users 
-            WHERE CNICNo = @cnic 
             AND UserPassword = @password
           `;
+          const result = await pool
+            .request()
+            .input("username", sql.VarChar, username)
+            .input("password", sql.VarChar, encryptedPassword)
+            .query(query);
 
-            // Query the database
-            const result = await pool
-              .request()
-              .input("cnic", sql.VarChar, cnic)
-              .input("password", sql.VarChar, encryptedPassword)
-              .query(query);
+          // Check if user exists
+          if (result.recordset.length > 0) {
+            const user = result.recordset[0];
+            console.log("Authenticated User:", user);
 
-            // Check if user exists
-            if (result.recordset.length > 0) {
-              const user = result.recordset[0];
-              console.log("Authenticated User:", user);
-              return {
-                id: user.UserId,
-                name: user.UserName,
-                firstName: user.FirstName,
-                lastName: user.LastName,
-                cnic: user.CNICNo,
-                email: user.Email,
-                gender: user.Gender,
-                companyId: user.CompanyId,
-                roleId: user.RoleId,
-                imagePath: user.ImagePath,
-                isAdmin: user.IsAdmin,
-                memberId: user.MemberId,
-                memberShipNo: user.MemberShipNo,
-              }; // Return user object for session
-            } else {
-              throw new Error("Invalid username or password");
-            }
+            // Ensure roleId is a number
+            const roleId = parseInt(user.RoleId) || 2; // Default to 2 if not set
+
+            const userData = {
+              id: user.UserId,
+              name: user.UserName,
+              fullname: user.FullName,
+              email: user.Email,
+              gender: user.Gender,
+              companyId: user.CompanyId,
+              roleId: roleId,
+              imagePath: user.ImagePath,
+            };
+
+            console.log("Returning user data:", userData);
+            return userData;
+          } else {
+            console.log("No user found with provided credentials");
+            throw new Error("Invalid username or password");
           }
         } catch (error) {
           console.error("Error authorizing user:", error);
@@ -111,44 +75,59 @@ export const authOptions = {
     }),
   ],
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    signIn: "/login",
+    error: "/login",
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        console.log("JWT callback - user data:", user);
+
         token.id = user.id;
         token.name = user.name;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
-        token.cnic = user.cnic;
+        token.fullname = user.fullname;
         token.email = user.email;
         token.gender = user.gender;
         token.companyId = user.companyId;
         token.roleId = user.roleId;
         token.imagePath = user.imagePath;
-        token.isAdmin = user.isAdmin;
-        token.memberId = user.memberId;
-        token.memberShipNo = user.memberShipNo;
+
+        // Add permissions based on roleId (you can customize this logic)
+        token.permissions =
+          user.roleId === 1
+            ? ["*"]
+            : [
+                "view_dashboard",
+                "view_employees",
+                "manage_employees",
+                "view_attendance",
+                "view_salary",
+                "view_departments",
+                "view_reports",
+                "view_calendar",
+                "view_settings",
+              ];
+
+        console.log("JWT callback - token permissions:", token.permissions);
       }
       return token;
     },
     async session({ session, token }) {
+      console.log("Session callback - token data:", token);
+
       session.user = {
         id: token.id,
         name: token.name,
-        firstName: token.firstName,
-        lastName: token.lastName,
-        cnic: token.cnic,
+        fullname: token.fullname,
         email: token.email,
         gender: token.gender,
         companyId: token.companyId,
         roleId: token.roleId,
         imagePath: token.imagePath,
-        isAdmin: token.isAdmin,
-        memberId: token.memberId,
-        memberShipNo: token.memberShipNo,
+        permissions: token.permissions,
       };
+
+      console.log("Session callback - session user:", session.user);
       return session;
     },
   },

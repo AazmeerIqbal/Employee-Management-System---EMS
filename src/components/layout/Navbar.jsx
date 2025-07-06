@@ -1,17 +1,23 @@
-
 import React from "react";
 import { Bell, Search } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "../../components/ui/button";
 
 const Navbar = () => {
-  const { logout } = useAuth();
+  const { data: session } = useSession();
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/login" });
+  };
 
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-card border-b shadow-sm">
       <div className="flex items-center space-x-2">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+            size={16}
+          />
           <input
             type="text"
             placeholder="Search..."
@@ -21,14 +27,23 @@ const Navbar = () => {
       </div>
       <div className="flex items-center space-x-4">
         <div className="relative">
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-foreground relative"
+          >
             <Bell size={18} />
             <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
           </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={logout}>
-          Logout
-        </Button>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-muted-foreground">
+            Welcome, {session?.user?.name || session?.user?.fullname || "User"}
+          </span>
+          <Button variant="outline" size="sm" onClick={handleLogout}>
+            Logout
+          </Button>
+        </div>
       </div>
     </header>
   );

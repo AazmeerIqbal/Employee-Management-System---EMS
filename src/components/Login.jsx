@@ -1,7 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn, getSession } from "next-auth/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useToast } from "../hooks/use-toast";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -9,17 +11,42 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Implement your login logic here
-    console.log("Login attempted with:", username, password);
-    // Simulate login for demo
-    setTimeout(() => {
+
+    try {
+      const result = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast({
+          title: "Login Failed",
+          description: "Invalid username or password",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
+        router.push("/employees");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login Failed",
+        description: "An error occurred during login",
+        variant: "destructive",
+      });
+    } finally {
       setLoading(false);
-      router.push("/dashboard"); // Redirect to dashboard after login
-    }, 1500);
+    }
   };
 
   return (

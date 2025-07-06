@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import {
   BarChart3,
@@ -16,23 +17,82 @@ import {
   Settings,
   Users,
 } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { user } = useAuth();
+  const { data: session } = useSession();
   const pathname = usePathname();
 
   const menuItems = [
-    { title: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/", permission: "view_dashboard" },
-    { title: "Employees", icon: <Users size={20} />, path: "/employees", permission: "view_employees" },
-    { title: "Attendance", icon: <Clock size={20} />, path: "/attendance", permission: "view_attendance" },
-    { title: "Salary", icon: <DollarSign size={20} />, path: "/salary", permission: "view_salary" },
-    { title: "Departments", icon: <Briefcase size={20} />, path: "/departments", permission: "view_departments" },
-    { title: "Reports", icon: <BarChart3 size={20} />, path: "/reports", permission: "view_reports" },
-    { title: "Calendar", icon: <Calendar size={20} />, path: "/calendar", permission: "view_calendar" },
-    { title: "Settings", icon: <Settings size={20} />, path: "/settings", permission: "view_settings" },
+    {
+      title: "Dashboard",
+      icon: <LayoutDashboard size={20} />,
+      path: "/",
+      permission: "view_dashboard",
+    },
+    {
+      title: "Employees",
+      icon: <Users size={20} />,
+      path: "/employees",
+      permission: "view_employees",
+    },
+    {
+      title: "Attendance",
+      icon: <Clock size={20} />,
+      path: "/attendance",
+      permission: "view_attendance",
+    },
+    {
+      title: "Salary",
+      icon: <DollarSign size={20} />,
+      path: "/salary",
+      permission: "view_salary",
+    },
+    {
+      title: "Departments",
+      icon: <Briefcase size={20} />,
+      path: "/departments",
+      permission: "view_departments",
+    },
+    {
+      title: "Reports",
+      icon: <BarChart3 size={20} />,
+      path: "/reports",
+      permission: "view_reports",
+    },
+    {
+      title: "Calendar",
+      icon: <Calendar size={20} />,
+      path: "/calendar",
+      permission: "view_calendar",
+    },
+    {
+      title: "Settings",
+      icon: <Settings size={20} />,
+      path: "/settings",
+      permission: "view_settings",
+    },
   ];
+
+  // Filter menu items based on user permissions
+  const filteredMenuItems = menuItems.filter((item) => {
+    // If no session or no permissions, show all items (fallback)
+    if (!session?.user?.permissions) {
+      console.log("No permissions found, showing all menu items");
+      return true;
+    }
+
+    // Check if user has wildcard permission or specific permission
+    const hasPermission =
+      session.user.permissions.includes("*") ||
+      session.user.permissions.includes(item.permission);
+
+    console.log(
+      `Menu item ${item.title}: permissions=${session.user.permissions}, hasPermission=${hasPermission}`
+    );
+
+    return hasPermission;
+  });
 
   return (
     <aside
@@ -55,7 +115,7 @@ const Sidebar = () => {
       </div>
       <div className="flex flex-col flex-1 overflow-y-auto">
         <nav className="flex-1 px-2 py-4 space-y-1">
-          {menuItems.map((item) => {
+          {filteredMenuItems.map((item) => {
             const isActive = pathname === item.path;
             return (
               <Link
@@ -67,7 +127,9 @@ const Sidebar = () => {
                     : "text-sidebar-foreground hover:bg-[hsl(var(--sidebar-accent)/0.2)]"
                 }`}
               >
-                <span className="flex items-center justify-center">{item.icon}</span>
+                <span className="flex items-center justify-center">
+                  {item.icon}
+                </span>
                 {!collapsed && <span className="ml-3">{item.title}</span>}
               </Link>
             );
@@ -78,11 +140,17 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-full bg-[hsl(var(--sidebar-accent)/0.2)] flex items-center justify-center">
-              {user?.name?.charAt(0) || "U"}
+              {session?.user?.name?.charAt(0) ||
+                session?.user?.fullname?.charAt(0) ||
+                "U"}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">{user?.name || "User"}</span>
-              <span className="text-xs opacity-75">{user?.role || "Admin"}</span>
+              <span className="text-sm font-medium">
+                {session?.user?.name || session?.user?.fullname || "User"}
+              </span>
+              <span className="text-xs opacity-75">
+                {session?.user?.roleId === 1 ? "Admin" : "User"}
+              </span>
             </div>
           </div>
         )}

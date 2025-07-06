@@ -4,7 +4,7 @@ const config = {
   user: "sa",
   password: "test",
   server: "AZMEER",
-  database: "EMS",
+  database: "HR",
   options: {
     trustServerCertificate: true,
     trustedConnection: false,
