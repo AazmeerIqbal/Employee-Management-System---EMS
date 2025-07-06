@@ -98,17 +98,19 @@ const Sidebar = () => {
     <aside
       className={`bg-sidebar text-sidebar-foreground flex flex-col h-full ${
         collapsed ? "w-16" : "w-64"
-      } transition-all duration-300 ease-in-out shadow-lg`}
+      } transition-all duration-300 ease-in-out shadow-lg border-r border-sidebar-border`}
     >
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-4 border-b border-sidebar-border/30">
         {!collapsed && (
           <div className="text-xl font-bold flex items-center">
-            <span>AuraHR</span>
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-white">
+              AuraHR
+            </span>
           </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1 rounded-md bg-[hsl(var(--sidebar-accent)/0.2)] text-sidebar-foreground hover:bg-sidebar-accent/30"
+          className="p-1 rounded-md bg-sidebar-accent/20 text-sidebar-foreground hover:bg-sidebar-accent/30 transition-all duration-200 hover:scale-105"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
@@ -121,34 +123,36 @@ const Sidebar = () => {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:scale-105 ${
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-[hsl(var(--sidebar-accent)/0.2)]"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-md"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/20"
                 }`}
               >
                 <span className="flex items-center justify-center">
                   {item.icon}
                 </span>
-                {!collapsed && <span className="ml-3">{item.title}</span>}
+                {!collapsed && (
+                  <span className="ml-3 font-medium">{item.title}</span>
+                )}
               </Link>
             );
           })}
         </nav>
       </div>
-      <div className="p-4 border-t border-[hsl(var(--sidebar-border)/0.3)]">
+      <div className="p-4 border-t border-sidebar-border/30">
         {!collapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-[hsl(var(--sidebar-accent)/0.2)] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-sidebar-accent/20 flex items-center justify-center text-sidebar-foreground font-medium">
               {session?.user?.name?.charAt(0) ||
                 session?.user?.fullname?.charAt(0) ||
                 "U"}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium text-sidebar-foreground">
                 {session?.user?.name || session?.user?.fullname || "User"}
               </span>
-              <span className="text-xs opacity-75">
+              <span className="text-xs opacity-75 text-sidebar-foreground">
                 {session?.user?.roleId === 1 ? "Admin" : "User"}
               </span>
             </div>

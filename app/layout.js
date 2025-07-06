@@ -2,6 +2,7 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider, useSession } from "next-auth/react";
+import { ThemeProvider } from "../src/hooks/useTheme";
 import "./globals.css";
 
 import Sidebar from "../src/components/layout/Sidebar";
@@ -67,9 +68,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider>
-          <AppContent>{children}</AppContent>
-        </SessionProvider>
+        <ThemeProvider>
+          <SessionProvider>
+            <AppContent>{children}</AppContent>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
