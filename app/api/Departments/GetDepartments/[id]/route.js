@@ -7,14 +7,14 @@ export async function GET(req) {
     const pool = await connectToDB(config);
 
     // Run queries to fetch data from multiple tables
-    const employees = await pool.request().query("SELECT * FROM Employee_mst");
+    const result = await pool.request().query("SELECT * FROM Employee_Dept");
     // Close the database connection
     await closeConnection(pool);
 
     // Return success response with all fetched data
     return NextResponse.json({
   message: "Query executed successfully.",
-  data: employees.recordset
+  data: result.recordset
 });
 
   } catch (error) {

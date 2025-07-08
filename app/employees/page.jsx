@@ -1,158 +1,157 @@
 "use client";
 
-import React, { useState } from "react"
-import { Helmet } from "react-helmet"
-import EmployeeTable from "../../src/components/employees/EmployeeTable"
-import EmployeeForm from "../../src/components/employees/EmployeeForm"
-import { Button } from "../../src/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import { useToast } from "../../src/hooks/use-toast"
+import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import EmployeeTable from "../../src/components/employees/EmployeeTable";
+import EmployeeForm from "../../src/components/employees/EmployeeForm";
+import { Button } from "../../src/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useToast } from "../../src/hooks/use-toast";
+import { useSession } from "next-auth/react";
 
-// Mock employee data
-const mockEmployees = [
-  {
-    id: "1",
-    name: "Alex Johnson",
-    email: "alex.j@example.com",
-    department: "Engineering",
-    role: "Frontend Developer",
-    status: "active",
-    joinedDate: "April 12, 2023",
-    image: ""
-  },
-  {
-    id: "2",
-    name: "Sarah Wilson",
-    email: "sarah.w@example.com",
-    department: "Marketing",
-    role: "Marketing Specialist",
-    status: "active",
-    joinedDate: "January 5, 2023",
-    image: ""
-  },
-  {
-    id: "3",
-    name: "Michael Brown",
-    email: "michael.b@example.com",
-    department: "Finance",
-    role: "Financial Analyst",
-    status: "inactive",
-    joinedDate: "June 18, 2022",
-    image: ""
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily.d@example.com",
-    department: "HR",
-    role: "HR Specialist",
-    status: "on-leave",
-    joinedDate: "March 10, 2022",
-    image: ""
-  },
-  {
-    id: "5",
-    name: "David Martinez",
-    email: "david.m@example.com",
-    department: "Engineering",
-    role: "Backend Developer",
-    status: "active",
-    joinedDate: "August 22, 2023",
-    image: ""
-  },
-  {
-    id: "6",
-    name: "Jennifer Lee",
-    email: "jennifer.l@example.com",
-    department: "Operations",
-    role: "Operations Manager",
-    status: "active",
-    joinedDate: "September 15, 2023",
-    image: ""
-  }
-]
 
 const Employees = () => {
-  const [employees, setEmployees] = useState(mockEmployees)
-  const [currentView, setCurrentView] = useState("list")
-  const [selectedEmployee, setSelectedEmployee] = useState(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
+  const { data: session } = useSession();
+  const [employees, setEmployees] = useState([]);
+  const [currentView, setCurrentView] = useState("list");
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
-  const handleViewEmployee = employee => {
-    setSelectedEmployee(employee)
-    setCurrentView("view")
+  console.log("Session Data:", session.user.id);
+
+ const getEmployeeData = async () => {
+  try {
+    const apiUrl = `/api/Employees/GetEmployees/${session.user.id}`;
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log("Fetched Employees:", data.data);
+    
+    setEmployees(data.data || []);
+
+  } catch (error) {
+    console.error("Error fetching employee data:", error);
+  }
+};
+
+  useEffect(() => {
+    if (session && session.user && session.user.id) {
+      getEmployeeData();
+    }
+  }, [session]);
+
+  const getDepartmentData = async () => {
+    try {
+      const apiUrl = `/api/Departments/GetDepartments/${session.user.id}`;
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log("Fetched Departments:", data.data);
+      
+      // Assuming you want to do something with the department data
+      setDepartments(data.data || []);
+
+    } catch (error) {
+      console.error("Error fetching department data:", error);
+    }
   }
 
-  const handleEditEmployee = employee => {
-    setSelectedEmployee(employee)
-    setCurrentView("edit")
-  }
+    useEffect(() => {
+    if (session && session.user && session.user.id) {
+      getDepartmentData();
+    }
+  }, [session]);
 
-  const handleDeleteEmployee = employeeId => {
+
+
+  const handleViewEmployee = (employee) => {
+    setSelectedEmployee(employee);
+    setCurrentView("view");
+  };
+
+  const handleEditEmployee = (employee) => {
+    setSelectedEmployee(employee);
+    setCurrentView("edit");
+  };
+
+  const handleDeleteEmployee = (employeeId) => {
     // In a real app, you would make an API call
     // For now, we just filter the employee out of our state
-    setEmployees(employees.filter(emp => emp.id !== employeeId))
+    setEmployees(employees.filter((emp) => emp.id !== employeeId));
     toast({
       title: "Employee deleted",
-      description: "The employee has been removed successfully"
-    })
-  }
+      description: "The employee has been removed successfully",
+    });
+  };
 
   const handleAddNew = () => {
-    setSelectedEmployee(null)
-    setCurrentView("add")
-  }
+    setSelectedEmployee(null);
+    setCurrentView("add");
+  };
 
-  const handleSubmit = async data => {
-    setIsSubmitting(true)
+  const handleSubmit = async (data) => {
+    setIsSubmitting(true);
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    if (currentView === "add") {
-      // Generate a random ID (in a real app, the backend would do this)
-      const newEmployee = {
-        ...data,
-        id: `${employees.length + 1}`,
-        status: data.status || "active",
-        role: data.role || "",
-        email: data.email || "",
-        department: data.department || "",
-        joinedDate: data.joinedDate || new Date().toLocaleDateString(),
-        image: data.image || "",
-        name: data.name || ""
-      }
-      setEmployees([...employees, newEmployee])
-      toast({
-        title: "Employee added",
-        description: "The employee has been added successfully"
-      })
-    } else if (currentView === "edit" && selectedEmployee) {
-      setEmployees(
-        employees.map(emp =>
-          emp.id === selectedEmployee.id
-            ? {
-                ...emp,
-                ...data,
-                status: data.status || emp.status
-              }
-            : emp
-        )
-      )
-      toast({
-        title: "Employee updated",
-        description: "The employee has been updated successfully"
-      })
-    }
+    getEmployeeData();
 
-    setIsSubmitting(false)
-    setCurrentView("list")
-  }
+    // if (currentView === "add") {
+    //   // Generate a random ID (in a real app, the backend would do this)
+    //   const newEmployee = {
+    //     ...data,
+    //     id: `${employees.length + 1}`,
+    //     status: data.status || "active",
+    //     role: data.role || "",
+    //     email: data.email || "",
+    //     department: data.department || "",
+    //     joinedDate: data.joinedDate || new Date().toLocaleDateString(),
+    //     image: data.image || "",
+    //     name: data.name || "",
+    //   };
+    //   setEmployees([...employees, newEmployee]);
+    //   toast({
+    //     title: "Employee added",
+    //     description: "The employee has been added successfully",
+    //   });
+    // } else if (currentView === "edit" && selectedEmployee) {
+    //   setEmployees(
+    //     employees.map((emp) =>
+    //       emp.id === selectedEmployee.id
+    //         ? {
+    //             ...emp,
+    //             ...data,
+    //             status: data.status || emp.status,
+    //           }
+    //         : emp
+    //     )
+    //   );
+    //   toast({
+    //     title: "Employee updated",
+    //     description: "The employee has been updated successfully",
+    //   });
+    // }
+
+    setIsSubmitting(false);
+    setCurrentView("list");
+  };
 
   const goBack = () => {
-    setCurrentView("list")
-    setSelectedEmployee(null)
-  }
+    setCurrentView("list");
+    setSelectedEmployee(null);
+  };
 
   return (
     <>
@@ -170,6 +169,7 @@ const Employees = () => {
             </div>
             <EmployeeTable
               employees={employees}
+              department={departments}
               onView={handleViewEmployee}
               onEdit={handleEditEmployee}
               onDelete={handleDeleteEmployee}
@@ -210,7 +210,7 @@ const Employees = () => {
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Employees
+export default Employees;

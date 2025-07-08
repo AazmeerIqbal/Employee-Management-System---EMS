@@ -34,7 +34,14 @@ import {
   SelectValue,
 } from "../ui/select";
 
-const EmployeeTable = ({ employees, onView, onEdit, onDelete, onAddNew }) => {
+const EmployeeTable = ({
+  employees,
+  department,
+  onView,
+  onEdit,
+  onDelete,
+  onAddNew,
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
 
@@ -43,18 +50,25 @@ const EmployeeTable = ({ employees, onView, onEdit, onDelete, onAddNew }) => {
     ...Array.from(new Set(employees.map((emp) => emp.department))),
   ];
 
-  // Filter employees based on search query and department filter
+  const getDepartmentName = (id) => {
+    const dept = department.find((d) => d.EmpDeptId === id);
+    return dept ? dept.DeptName : "Unknown";
+  };
+
   const filteredEmployees = employees.filter((employee) => {
+    const name = employee.EmpName?.toLowerCase() || "";
+    const email = employee.email?.toLowerCase() || "";
+    const role = employee.role?.toLowerCase() || "";
     const matchesSearch =
-      employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.role.toLowerCase().includes(searchQuery.toLowerCase());
+      name.includes(searchQuery.toLowerCase()) ||
+      email.includes(searchQuery.toLowerCase()) ||
+      role.includes(searchQuery.toLowerCase());
 
     const matchesDepartment =
-      departmentFilter === "all" || employee.department === departmentFilter;
+      departmentFilter === "all" ||
+      employee.MainDepartment === departmentFilter;
 
     return matchesSearch && matchesDepartment;
-
   });
 
   const getStatusBadgeStyle = (status) => {
@@ -69,7 +83,6 @@ const EmployeeTable = ({ employees, onView, onEdit, onDelete, onAddNew }) => {
         return "bg-gray-100 text-gray-800 hover:bg-gray-200";
     }
   };
-
 
   return (
     <div className="space-y-4">
@@ -123,7 +136,7 @@ const EmployeeTable = ({ employees, onView, onEdit, onDelete, onAddNew }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredEmployees.length === 0 ? (
+            {employees.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -133,48 +146,62 @@ const EmployeeTable = ({ employees, onView, onEdit, onDelete, onAddNew }) => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredEmployees.map((employee) => (
-                <TableRow key={employee.id}>
+              employees.map((employee) => (
+                <TableRow key={employee.EmpId}>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9">
-                        <AvatarImage src={employee.image} alt={employee.name} />
+                        <AvatarImage
+                          src={employee.image}
+                          alt={employee.EmpName}
+                        />
                         <AvatarFallback>
-                          {employee.name
-                            .split(" ")
+                          {employee.EmpName?.split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{employee.name}</p>
-                        <p className="text-xs text-muted-foreground sm:hidden">
-                          {employee.email}
-                        </p>
-                        <p className="text-xs text-muted-foreground sm:hidden">
-                          {employee.department}
-                        </p>
+                        <p className="font-medium">{employee.EmpName}</p>{" "}
                       </div>
                     </div>
                   </TableCell>
+
                   <TableCell className="hidden md:table-cell">
-                    {employee.email}
+                    {employee.Unit}
                   </TableCell>
+
                   <TableCell className="hidden sm:table-cell">
-                    {employee.department}
+                    {getDepartmentName(employee.EmpDeptId)}
                   </TableCell>
+
                   <TableCell className="hidden lg:table-cell">
-                    {employee.joinedDate}
+                    {employee.SubDepartment}
                   </TableCell>
+
+                  <TableCell className="hidden sm:table-cell">
+                    {employee.CNICNo}
+                  </TableCell>
+
+                  <TableCell className="hidden sm:table-cell">
+                    {employee.CellNo}
+                  </TableCell>
+
+                  <TableCell className="hidden sm:table-cell">
+                    {employee.DOB}
+                  </TableCell>
+
                   <TableCell className="hidden sm:table-cell">
                     <Badge
                       variant="outline"
                       className={getStatusBadgeStyle(employee.status)}
                     >
-                      {employee.status === "on-leave"
-                        ? "On Leave"
-                        : employee.status.charAt(0).toUpperCase() +
-                          employee.status.slice(1)}
+                      {employee.status
+                        ? employee.status === "on-leave"
+                          ? "On Leave"
+                          : employee.status.charAt(0).toUpperCase() +
+                            employee.status.slice(1)
+                        : "Unknown"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
