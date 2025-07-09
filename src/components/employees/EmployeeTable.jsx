@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactPaginate from "react-paginate";
 import {
   Table,
   TableBody,
@@ -37,6 +38,8 @@ import {
 const EmployeeTable = ({
   employees,
   department,
+  mainDepartment,
+  branch,
   onView,
   onEdit,
   onDelete,
@@ -50,9 +53,24 @@ const EmployeeTable = ({
     ...Array.from(new Set(employees.map((emp) => emp.department))),
   ];
 
-  const getDepartmentName = (id) => {
-    const dept = department.find((d) => d.EmpDeptId === id);
-    return dept ? dept.DeptName : "Unknown";
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "";
+    return new Date(isoDate).toLocaleDateString("en-GB"); // "10/03/1971"
+  };
+
+  const getMainDepartmentName = (id) => {
+    const mainDept = mainDepartment.find((d) => d.MainDeptID === id);
+    return mainDept ? mainDept.MainDeptName : "Unknown";
+  };
+
+  const getSubDepartmentName = (id) => {
+    const subDept = department.find((d) => d.EmpDeptId === id);
+    return subDept ? subDept.DeptName : "Unknown";
+  };
+
+  const getBranchName = (id) => {
+    const Unit = branch.find((d) => d.BranchID === id);
+    return Unit ? Unit.BranchName : "Unknown";
   };
 
   const filteredEmployees = employees.filter((employee) => {
@@ -70,6 +88,20 @@ const EmployeeTable = ({
 
     return matchesSearch && matchesDepartment;
   });
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const rowsPerPage = 10;
+
+  const offset = currentPage * rowsPerPage;
+  const paginatedEmployees = filteredEmployees.slice(
+    offset,
+    offset + rowsPerPage
+  );
+  const pageCount = Math.ceil(filteredEmployees.length / rowsPerPage);
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
 
   const getStatusBadgeStyle = (status) => {
     switch (status) {
@@ -136,7 +168,7 @@ const EmployeeTable = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {employees.length === 0 ? (
+            {filteredEmployees.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -146,7 +178,7 @@ const EmployeeTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              employees.map((employee) => (
+              paginatedEmployees.map((employee) => (
                 <TableRow key={employee.EmpId}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -168,15 +200,15 @@ const EmployeeTable = ({
                   </TableCell>
 
                   <TableCell className="hidden md:table-cell">
-                    {employee.Unit}
+                    {getBranchName(employee.BranchId)}
                   </TableCell>
 
                   <TableCell className="hidden sm:table-cell">
-                    {getDepartmentName(employee.EmpDeptId)}
+                    {getMainDepartmentName(employee.MainDeptId)}
                   </TableCell>
 
                   <TableCell className="hidden lg:table-cell">
-                    {employee.SubDepartment}
+                    {getSubDepartmentName(employee.EmpDeptId)}
                   </TableCell>
 
                   <TableCell className="hidden sm:table-cell">
@@ -188,7 +220,7 @@ const EmployeeTable = ({
                   </TableCell>
 
                   <TableCell className="hidden sm:table-cell">
-                    {employee.DOB}
+                    {formatDate(employee.DOB)}
                   </TableCell>
 
                   <TableCell className="hidden sm:table-cell">
@@ -252,22 +284,33 @@ const EmployeeTable = ({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing <b>{filteredEmployees.length}</b> of <b>{employees.length}</b>{" "}
-          employees
+      <div className="flex   items-center mt-6 ">
+        <p className="text-sm text-muted-foreground mr-2">
+          Showing <b>{paginatedEmployees.length}</b> of{" "}
+          <b>{filteredEmployees.length}</b> employees
         </p>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon" disabled>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm" className="text-xs">
-            1
-          </Button>
-          <Button variant="outline" size="icon" disabled>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        <ReactPaginate
+          previousLabel={
+            <span className="flex items-center justify-center w-8 h-8 border rounded hover:bg-gray-800 text-sm">
+              <ChevronLeft className="h-4 w-4" />
+            </span>
+          }
+          nextLabel={
+            <span className="flex items-center justify-center w-8 h-8 border rounded hover:bg-gray-800 text-sm">
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          }
+          breakLabel={<span className="px-2 py-1 text-sm">...</span>}
+          pageCount={pageCount}
+          marginPagesDisplayed={1}
+          pageRangeDisplayed={2}
+          onPageChange={handlePageClick}
+          forcePage={currentPage}
+          containerClassName="flex w-full justify-center cursor-pointer mr-6 items-center gap-2  flex-wrap"
+          pageLinkClassName="px-3 py-1 border rounded text-sm hover:bg-gray-800 hover:text-white"
+          activeLinkClassName="bg-blue-600 text-white"
+          disabledClassName="opacity-50 cursor-not-allowed"
+        />
       </div>
     </div>
   );

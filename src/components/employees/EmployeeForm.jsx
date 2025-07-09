@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import ReactSelect from "react-select";
+import { useTheme } from "next-themes"; // ✅ No conflict now
+import { Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
@@ -15,7 +18,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import {
-  Select,
+Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
@@ -23,6 +26,7 @@ import {
 } from "../ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Loader2, Upload } from "lucide-react";
+
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -38,49 +42,15 @@ const formSchema = z.object({
     .regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid salary amount"),
 });
 
-const departments = [
-  "Engineering",
-  "Human Resources",
-  "Sales",
-  "Marketing",
-  "Operations",
-  "Finance",
-  "IT",
-  "Customer Support",
-];
 
-const mainDepart = [
-  "AH",
-  "DC",
-  "SC Iqbal",
-  "SC Asif",
-  "SC Kashif",
-  "SC Ghaffar",
-  "BC Shakeel",
-  "SC Nadeem Bhai",
-  "SC Khalid",
-  "SC Shahid",
-  "CC Najam",
-  "SC Saeed",
-];
 
-const subDepart = [
-  "Adminnistration",
-  "Accounts",
-  "Merchardizing",
-  "Store",
-  "Quality Control",
-  "Production",
-  "Sample Depart",
-  "SC Nadeem Bhai",
-  "Fabrication",
-  "Loaders",
-  "Helpers",
-  "MISC",
-  "Logistics",
-];
-
-const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
+const EmployeeForm = ({
+  defaultValues,
+  onSubmit,
+  isSubmitting,
+  mainDepartment,
+  subDepartment, Branch = false,
+}) => {
   const [imagePreview, setImagePreview] = useState(defaultValues?.image);
 
   const form = useForm({
@@ -93,7 +63,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
       email: "",
       phone: "",
       department: "",
-      mainDepartment: "",
+      MainDeptID: "",
       subDepartment: "",
       gender: "",
       role: "",
@@ -126,6 +96,15 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
     },
   });
 
+  useEffect(() => {
+    if (defaultValues) {
+      form.reset(defaultValues); // Reset all form values
+      setImagePreview(defaultValues.image || ""); // Reset profile image preview
+    }
+  }, [defaultValues]);
+
+  console.log("defaultValues", defaultValues);
+
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -141,9 +120,6 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
   const handleFormSubmit = (data) => {
     onSubmit({ ...data, image: imagePreview });
   };
-
-  const [cnic, setCnic] = useState("");
-  const [phone, setPhone] = useState("");
 
   const formatCnic = (value) => {
     const digits = value.replace(/\D/g, "").slice(0, 13);
@@ -163,6 +139,64 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
     return formatted;
   };
 
+
+  const customStyles = (isDarkMode) => ({
+  control: (base , state) => ({
+    ...base,
+    backgroundColor: isDarkMode ? "#1f2937" : "", // dark: gray-800, light: white
+    borderColor: state.isFocused ? "#6366f1" : isDarkMode ? "#374151" : "#d1d5db", // dark: gray-700, light: gray-300
+    color: isDarkMode ? "#f3f4f6" : "", // dark: gray-100, light: gray-900
+    boxShadow: "none",
+    "&:hover": {
+      borderColor: isDarkMode ? "#4b5563" : "#9ca3af", // subtle hover border
+    },
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: isDarkMode ? "#1f2937" : "#fff",
+    color: isDarkMode ? "#f3f4f6" : "#111827",
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isSelected
+      ? isDarkMode
+        ? "#4f46e5"
+        : "#6366f1"
+      : state.isFocused
+      ? isDarkMode
+        ? "#374151"
+        : "#e5e7eb"
+      : "transparent",
+    color: isDarkMode ? "#f3f4f6" : "#111827",
+    cursor: "pointer",
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: isDarkMode ? "#f3f4f6" : "",
+  }),
+  input: (base) => ({
+    ...base,
+    color: isDarkMode ? "#f3f4f6" : "",
+  }),
+});
+
+  const { theme } = useTheme(); // dark / light
+  const isDarkMode = theme === "dark";
+
+  const departmentOptions =
+    subDepartment?.map((dept) => ({
+      value: dept.EmpDeptId,
+      label: dept.DeptName,
+    })) || [];
+
+      const mainDepartmentOptions =
+    mainDepartment?.map((dept) => ({
+      value: dept.MainDeptId,
+      label: dept.MainDeptName,
+    })) || [];
+
+
+
   return (
     <Form {...form}>
       <form
@@ -174,7 +208,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
             <div className="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="empCode"
+                name="EmpId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Emp Code</FormLabel>
@@ -211,7 +245,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
               <FormField
                 control={form.control}
-                name="name"
+                name="EmpName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
@@ -225,7 +259,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
               <FormField
                 control={form.control}
-                name="fatherName"
+                name="FatherName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Father Name</FormLabel>
@@ -267,7 +301,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
               <FormField
                 control={form.control}
-                name="cnic"
+                name="CNICNo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>CNIC #</FormLabel>
@@ -288,7 +322,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="CellNo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
@@ -371,7 +405,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             control={form.control}
-            name="branch"
+            name="BranchId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Unit/Branch</FormLabel>
@@ -382,35 +416,11 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Unit I">Unit 1</SelectItem>
-                    <SelectItem value="General">General</SelectItem>
-                    <SelectItem value="Unit II">Unit II</SelectItem>
-                    <SelectItem value="Unit III">Unit III</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="department"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Department</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a department" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {departments.map((department) => (
-                      <SelectItem key={department} value={department}>
-                        {department}
+                    {Branch.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit.BranchName}
                       </SelectItem>
-                    ))}
+                    ))}u
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -418,59 +428,67 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
             )}
           />
 
-          <FormField
+
+         <FormField
+      control={form.control}
+      name="MainDeptID"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Sub Department</FormLabel>
+          <Controller
             control={form.control}
-            name="mainDepartment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Main Department</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Main Department" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {mainDepart.map((mainDepart) => (
-                      <SelectItem key={mainDepart} value={mainDepart}>
-                        {mainDepart}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
+            name="EmpDeptID"
+            render={({ field: { onChange, value, ref } }) => (
+              <ReactSelect
+                inputRef={ref}
+                value={mainDepartmentOptions.find((opt) => opt.value === value)}
+                onChange={(selected) => onChange(selected?.value)}
+                options={mainDepartmentOptions}
+                placeholder="Select Main Department"
+                isSearchable
+                className="react-select-container"
+                classNamePrefix="react-select"
+                styles={customStyles(isDarkMode)}
+              />
             )}
           />
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+
+    <FormField
+      control={form.control}
+      name="EmpDeptID"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Sub Department</FormLabel>
+          <Controller
+            control={form.control}
+            name="EmpDeptID"
+            render={({ field: { onChange, value, ref } }) => (
+              <ReactSelect
+                inputRef={ref}
+                value={departmentOptions.find((opt) => opt.value === value)}
+                onChange={(selected) => onChange(selected?.value)}
+                options={departmentOptions}
+                placeholder="Select Sub Department"
+                isSearchable
+                className="react-select-container"
+                classNamePrefix="react-select"
+                styles={customStyles(isDarkMode)}
+              />
+            )}
+          />
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  
 
           <FormField
             control={form.control}
-            name="subDepartment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sub Department</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a  Sub Department" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {subDepart.map((subDepart) => (
-                      <SelectItem key={subDepart} value={subDepart}>
-                        {subDepart}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="gender"
+            name="Gender"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Gender</FormLabel>
@@ -492,7 +510,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="designation"
+            name="Designation"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Designation</FormLabel>
@@ -506,7 +524,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="dateOfBirth"
+            name="DOB"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Date Of Birth</FormLabel>
@@ -520,7 +538,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="joinedDate"
+            name="JoiningDate"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Joining Date</FormLabel>
@@ -534,7 +552,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="email"
+            name="EmailId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email Address</FormLabel>
@@ -586,7 +604,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="emergencyContactName"
+            name="EmergencyContactName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Emergency Contact Name</FormLabel>
@@ -600,7 +618,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="emergencyContactNumber"
+            name="EmergencyContactNo"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Emergency Contact Number</FormLabel>
@@ -636,7 +654,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="martialStatus"
+            name="MaritalStatus"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Martial Status</FormLabel>
@@ -661,7 +679,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="numberOfDepends"
+            name="Dependents"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Number Of Depends</FormLabel>
@@ -704,7 +722,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="lastCompany"
+            name="LastCompany"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Last Company</FormLabel>
@@ -775,7 +793,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="resigningDate"
+            name="ResigningDate"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Resigning Date</FormLabel>
@@ -789,7 +807,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="employeeType"
+            name="EmpType"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Employeement Type</FormLabel>
@@ -811,7 +829,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="formBReference"
+            name="FormBNo"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Form B Refrence</FormLabel>
@@ -827,7 +845,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
         <div>
           <FormField
             control={form.control}
-            name="address"
+            name="PostalAddress"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Address</FormLabel>
@@ -844,7 +862,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="permanentAddress"
+            name="PermanentAddress"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Permanent Address</FormLabel>
@@ -858,7 +876,7 @@ const EmployeeForm = ({ defaultValues, onSubmit, isSubmitting = false }) => {
 
           <FormField
             control={form.control}
-            name="note"
+            name="Note"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Note</FormLabel>

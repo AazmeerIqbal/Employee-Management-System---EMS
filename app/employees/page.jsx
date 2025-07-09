@@ -16,10 +16,14 @@ const Employees = () => {
   const [currentView, setCurrentView] = useState("list");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [departments, setDepartments] = useState([]);
+   const [mainDepartments, setMainDepartments] = useState([]);
+    const [branch, setBranch] = useState([]);
+    
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   console.log("Session Data:", session.user.id);
+ console.log("Branch Data:", branch);
 
  const getEmployeeData = async () => {
   try {
@@ -47,9 +51,12 @@ const Employees = () => {
     }
   }, [session]);
 
-  const getDepartmentData = async () => {
+
+  
+
+    const getMainDepartmentData = async () => {
     try {
-      const apiUrl = `/api/Departments/GetDepartments/${session.user.id}`;
+      const apiUrl = `/api/Departments/MainDepartments/${session.user.id}`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -58,7 +65,35 @@ const Employees = () => {
       });
 
       const data = await response.json();
-      console.log("Fetched Departments:", data.data);
+      console.log("Fetched MainDepartments:", data.data);
+      
+      // Assuming you want to do something with the department data
+      setMainDepartments(data.data || []);
+
+    } catch (error) {
+      console.error("Error fetching department data:", error);
+    }
+  }
+
+    useEffect(() => {
+    if (session && session.user && session.user.id) {
+      getMainDepartmentData();
+    }
+  }, [session]);
+
+
+  const getDepartmentData = async () => {
+    try {
+      const apiUrl = `/api/Departments/SubDepartments/${session.user.id}`;
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log("Fetched SubDepartments:", data.data);
       
       // Assuming you want to do something with the department data
       setDepartments(data.data || []);
@@ -75,6 +110,35 @@ const Employees = () => {
   }, [session]);
 
 
+  
+  const getBranchData = async () => {
+    try {
+      const apiUrl = `/api/Branch/GetBranch/${session.user.id}`;
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log("Fetched SubDepartments:", data.data);
+      
+      // Assuming you want to do something with the department data
+      setBranch(data.data || []);
+
+    } catch (error) {
+      console.error("Error fetching department data:", error);
+    }
+  }
+
+    useEffect(() => {
+    if (session && session.user && session.user.id) {
+      getBranchData();
+    }
+  }, [session]);
+
+
 
   const handleViewEmployee = (employee) => {
     setSelectedEmployee(employee);
@@ -86,72 +150,101 @@ const Employees = () => {
     setCurrentView("edit");
   };
 
-  const handleDeleteEmployee = (employeeId) => {
-    // In a real app, you would make an API call
-    // For now, we just filter the employee out of our state
-    setEmployees(employees.filter((emp) => emp.id !== employeeId));
+
+const handleDeleteEmployee = async (employeeId) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`/api/Employees/DeleteEmployee/${employeeId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete employee.");
+    }
+
     toast({
       title: "Employee deleted",
-      description: "The employee has been removed successfully",
+      description: "The employee has been removed successfully.",
     });
-  };
+
+    // Reload employee list
+    await getEmployeeData();
+  } catch (error) {
+    console.error("Delete error:", error);
+    toast({
+      title: "Error",
+      description: error.message || "Failed to delete employee.",
+      variant: "destructive",
+    });
+  }
+};
+
+
 
   const handleAddNew = () => {
     setSelectedEmployee(null);
     setCurrentView("add");
   };
 
-  const handleSubmit = async (data) => {
-    setIsSubmitting(true);
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const handleSubmit = async (formData) => {
+  setIsSubmitting(true);
 
-    getEmployeeData();
+  try {
+    const isEdit = currentView === "edit";
+    const endpoint = isEdit
+      ? `/api/Employees/EditEmployee/${selectedEmployee.EmpId}`
+      : `/api/Employees/InsertEmployees`;
 
-    // if (currentView === "add") {
-    //   // Generate a random ID (in a real app, the backend would do this)
-    //   const newEmployee = {
-    //     ...data,
-    //     id: `${employees.length + 1}`,
-    //     status: data.status || "active",
-    //     role: data.role || "",
-    //     email: data.email || "",
-    //     department: data.department || "",
-    //     joinedDate: data.joinedDate || new Date().toLocaleDateString(),
-    //     image: data.image || "",
-    //     name: data.name || "",
-    //   };
-    //   setEmployees([...employees, newEmployee]);
-    //   toast({
-    //     title: "Employee added",
-    //     description: "The employee has been added successfully",
-    //   });
-    // } else if (currentView === "edit" && selectedEmployee) {
-    //   setEmployees(
-    //     employees.map((emp) =>
-    //       emp.id === selectedEmployee.id
-    //         ? {
-    //             ...emp,
-    //             ...data,
-    //             status: data.status || emp.status,
-    //           }
-    //         : emp
-    //     )
-    //   );
-    //   toast({
-    //     title: "Employee updated",
-    //     description: "The employee has been updated successfully",
-    //   });
-    // }
+    const method = isEdit ? "PUT" : "POST";
 
-    setIsSubmitting(false);
+    const response = await fetch(endpoint, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...formData,
+        UserId: session.user.id, // if required by backend
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to submit employee data.");
+    }
+
+    toast({
+      title: isEdit ? "Employee updated" : "Employee added",
+      description: `The employee has been successfully ${isEdit ? "updated" : "added"}.`,
+    });
+
+    // Reload employee data
+    await getEmployeeData();
     setCurrentView("list");
-  };
+    setSelectedEmployee(null);
+  } catch (error) {
+    console.error("Submit error:", error);
+    toast({
+      title: "Error",
+      description: error.message || "Something went wrong.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const goBack = () => {
     setCurrentView("list");
     setSelectedEmployee(null);
   };
+
+
+  console.log("Selected for edit:", selectedEmployee);
 
   return (
     <>
@@ -170,6 +263,8 @@ const Employees = () => {
             <EmployeeTable
               employees={employees}
               department={departments}
+              mainDepartment={mainDepartments}
+              branch={branch}
               onView={handleViewEmployee}
               onEdit={handleEditEmployee}
               onDelete={handleDeleteEmployee}
@@ -204,6 +299,9 @@ const Employees = () => {
                 defaultValues={selectedEmployee}
                 onSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
+                mainDepartment={mainDepartments}
+                    subDepartment={departments}
+                    Branch={branch}
               />
             </div>
           </>
