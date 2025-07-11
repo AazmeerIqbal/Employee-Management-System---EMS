@@ -9,69 +9,57 @@ export async function POST(req) {
 
     const result = await pool
       .request()
-      .input("CompanyID", body.companyId)
-      .input("BranchId", body.branchId)
-      .input("EmpCode", body.empCode)
-      .input("MainDeptID", body.mainDeptId)
-      .input("EmpDeptId", body.empDeptId)
-      .input("EmpType", body.empType)
-      .input("EmpName", body.empName)
-      .input("FatherName", body.fatherName)
-      .input("Gender", body.gender)
-      .input("Designation", body.designation)
-      .input("DOB", body.dob)
-      .input("JoiningDate", body.joiningDate)
-      .input("ResigningDate", body.resigningDate || null)
-      .input("CNICNo", body.cnicNo)
-      .input("CellNo", body.cellNo)
-      .input("EmergencyContactName", body.emergencyContactName)
-      .input("EmergencyContactNo", body.emergencyContactNo)
-      .input("EmailId", body.emailId)
-      .input("PostalAddress", body.postalAddress)
-      .input("CountryId", body.countryId)
-      .input("CityId", body.cityId)
-      .input("PostalZipCode", body.postalZipCode)
-      .input("BloodType", body.bloodType)
-      .input("MaritalStatus", body.maritalStatus)
-      .input("Dependents", body.dependents)
-      .input("ProfilePhoto", body.profilePhoto)
+      .input("CompanyID", parseInt(body.CompanyID))
+      .input("BranchId", parseInt(body.BranchId))
+      .input("EmpCode", body.EmpCode)
+      .input("MainDeptID", parseInt(body.MainDeptID))
+      .input("EmpDeptId", parseInt(body.EmpDeptId))
+      .input("EmpType", body.EmpType)
+      .input("EmpName", body.EmpName)
+      .input("FatherName", body.FatherName)
+      .input("Gender", body.Gender)
+      .input("Designation", body.Designation)
+      .input("DOB", body.DOB)
+      .input("JoiningDate", body.JoiningDate)
+      .input("ResigningDate", body.ResigningDate || null)
+      .input("CNICNo", body.CNICNo)
+      .input("CellNo", body.CellNo)
+      .input("EmergencyContactName", body.EmergencyContactName)
+      .input("EmergencyContactNo", body.EmergencyContactNo)
+      .input("EmailId", body.EmailId)
+      .input("ProfilePhoto", body.ProfilePhotos || null)
+      .input("PostalAddress", body.PostalAddress)
+      .input("CountryId", parseInt(body.CountryId))
+      .input("CityId", parseInt(body.CityId))
+      .input("BloodType", body.BloodType)
+      .input("MaritalStatus", body.MaritalStatus)
+      .input("Dependents", body.Dependents)
+      .input("Qualification", body.Qualification)
+      .input("PostalZipCode", body.PostalZipCode)
+      .input("LastCompany", body.LastCompany)
       .input("CreatedOn", new Date())
-      .input("CreatedBy", body.createdBy)
-      .input("LastUpdatedOn", new Date())
-      .input("LastUpdatedBy", body.lastUpdatedBy)
-      .input("Del", 0)
-      .input("IsSalaryTransfer", body.isSalaryTransfer)
-      .input("BankName", body.bankName)
-      .input("AccountNo", body.accountNo)
-      .input("IsOTApply", body.isOTApply)
-      .input("IsActive", body.isActive)
-      .input("IsAttRequired", body.isAttRequired)
-      .input("Qualification", body.qualification)
-      .input("LastCompany", body.lastCompany)
-      .input("Note", body.note)
-      .input("PermanentAddress", body.permanentAddress)
-      .input("IsOTOnHolidays", body.isOTOnHolidays)
-      .input("FormBNo", body.formBNo)
-      .input("RosterId", body.rosterId).query(`
+      .input("CreatedBy", body.UserId || null)
+       .input("LastUpdatedOn", new Date())
+      .input("LastUpdatedBy", body.UserId || null)
+      .input("Note", body.Note)
+      .input("PermanentAddress", body.PermanentAddress)
+      .input("FormBNo", body.FormBNo)
+      .input("RosterId", body.RosterId).query(`
         INSERT INTO Employee_mst (
-          CompanyID, BranchId, EmpCode, MainDeptID, EmpDeptId, EmpType,
+          CompanyID ,BranchId, EmpCode, MainDeptID, EmpDeptId, EmpType,
           EmpName, FatherName, Gender, Designation, DOB, JoiningDate,
-          ResigningDate, CNICNo, CellNo, EmergencyContactName, EmergencyContactNo,
-          EmailId, PostalAddress, CountryId, CityId, PostalZipCode, BloodType,
-          MaritalStatus, Dependents, ProfilePhoto, CreatedOn, CreatedBy,
-          LastUpdatedOn, LastUpdatedBy, Del, IsSalaryTransfer, BankName,
-          AccountNo, IsOTApply, IsActive, IsAttRequired, Qualification,
-          LastCompany, Note, PermanentAddress, IsOTOnHolidays, FormBNo, RosterId
+          ResigningDate, CNICNo, CellNo,PostalZipCode, EmergencyContactName, EmergencyContactNo,
+          EmailId, PostalAddress, CountryId, CityId, BloodType,ProfilePhoto
+          MaritalStatus, Dependents, Qualification,CreatedOn,CreatedBy,LastUpdatedOn, LastUpdatedBy,
+          LastCompany, Note, PermanentAddress,FormBNo,RosterId
         )
         VALUES (
-          @CompanyID, @BranchId, @EmpCode, @MainDeptID, @EmpDeptId, @EmpType,
+          @CompanyID ,@BranchId, @EmpCode, @MainDeptID, @EmpDeptId, @EmpType,
           @EmpName, @FatherName, @Gender, @Designation, @DOB, @JoiningDate,
-          @ResigningDate, @CNICNo, @CellNo, @EmergencyContactName, @EmergencyContactNo,
-          @EmailId, @PostalAddress, @CountryId, @CityId, @PostalZipCode, @BloodType,
-          @MaritalStatus, @Dependents, @ProfilePhoto, @CreatedOn, @CreatedBy,
-          @LastUpdatedOn, @LastUpdatedBy, @Del, @IsSalaryTransfer, @BankName,
-          @AccountNo, @IsOTApply, @IsActive, @IsAttRequired, @Qualification,
-          @LastCompany, @Note, @PermanentAddress, @IsOTOnHolidays, @FormBNo, @RosterId
+          @ResigningDate, @CNICNo, @CellNo, @PostalZipCode, @EmergencyContactName, @EmergencyContactNo,
+          @EmailId, @PostalAddress, @CountryId, @CityId, @BloodType,@ProfilePhoto,
+          @MaritalStatus, @Dependents, @Qualification,@CreatedOn, @CreatedBy,@LastUpdatedOn, @LastUpdatedBy,
+          @LastCompany, @Note, @PermanentAddress, @FormBNo,@RosterId
         )
       `);
 

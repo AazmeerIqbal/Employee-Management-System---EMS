@@ -1,8 +1,9 @@
+
 import { connectToDB, closeConnection, config } from "@/utils/database";
 import { NextResponse } from "next/server";
 
-// Dynamic route handler: /api/employee/delete/[id]
-export async function GET(req, { params }) {
+// Use DELETE instead of GET
+export async function DELETE(req, { params }) {
   try {
     const { id } = params;
 
@@ -13,10 +14,8 @@ export async function GET(req, { params }) {
       );
     }
 
-    // Connect to DB
     const pool = await connectToDB(config);
 
-    // Execute DELETE query
     await pool
       .request()
       .input("EmpId", parseInt(id))

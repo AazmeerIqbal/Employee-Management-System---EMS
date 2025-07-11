@@ -3,11 +3,9 @@ import { useForm } from "react-hook-form";
 import ReactSelect from "react-select";
 import { useTheme } from "next-themes"; // ✅ No conflict now
 import { Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
+
 import {
   Form,
   FormControl,
@@ -18,7 +16,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import {
-Select,
+  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
@@ -27,71 +25,52 @@ Select,
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Loader2, Upload } from "lucide-react";
 
-
-const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(6, "Please enter a valid phone number"),
-  department: z.string().min(1, "Please select a department"),
-  role: z.string().min(1, "Please enter a job role"),
-  joinedDate: z.string().min(1, "Please enter a joining date"),
-  address: z.string().optional(),
-  status: z.enum(["active", "inactive", "on-leave"]),
-  salary: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid salary amount"),
-});
-
-
-
 const EmployeeForm = ({
   defaultValues,
   onSubmit,
   isSubmitting,
   mainDepartment,
-  subDepartment, Branch = false,
+  subDepartment,
+  Branch = false,
 }) => {
-  const [imagePreview, setImagePreview] = useState(defaultValues?.image);
+  const [imagePreview, setImagePreview] = useState(defaultValues?.ProfilePhoto);
 
   const form = useForm({
-    resolver: zodResolver(formSchema),
     defaultValues: {
-      empCode: "",
-      name: "",
-      fatherName: "",
-      branch: "",
-      email: "",
-      phone: "",
-      department: "",
+      CompanyID: "",
+      EmpCode: "",
+      EmpName: "",
+      FatherName: "",
+      BranchId: "",
+      EmailId: "",
+      CellNo: "",
+      EmpDeptId: "",
       MainDeptID: "",
-      subDepartment: "",
-      gender: "",
-      role: "",
-      designation: "",
-      joinedDate: "",
-      address: "",
-      permanentAddress: "",
-      note: "",
-      status: "active",
-      salary: "",
-      martialStatus: "",
-      numberOfDepends: "",
-      bloodType: "",
-      lastCompany: "",
-      education: "",
-      country: "",
-      city: "",
-      resigningDate: "",
-      employeeType: "",
-      dateOfBirth: "",
-      cnic: "",
-      attendanceCategory: "",
-      emergencyContactName: "",
-      emergencyContactNumber: "",
-      religion: "",
-      nationality: "",
-      formBReference: "",
-      image: "",
+      Gender: "",
+      Role: "",
+      Designation: "",
+      JoiningDate: "",
+      PostalAddress: "",
+      PermanentAddress: "",
+      Note: "",
+      Status: "active",
+      MaritalStatus: "",
+      Dependents: "",
+      BloodType: "",
+      LastCompany: "",
+      Qualification: "",
+      CountryId: "",
+      CityId: "",
+      ResigningDate: "",
+      EmpType: "",
+      DOB: "",
+      CNICNo: "",
+      AttendanceCategory: "",
+      EmergencyContactName: "",
+      EmergencyContactNo: "",
+      FormBNo: "",
+      PostalZipCode: "",
+      RosterId: "",
       ...defaultValues,
     },
   });
@@ -118,7 +97,53 @@ const EmployeeForm = ({
   };
 
   const handleFormSubmit = (data) => {
-    onSubmit({ ...data, image: imagePreview });
+    // let hasError = false;
+
+    // if (!data.EmpName?.trim()) {
+    //   form.setError("EmpName", { message: "Employee name is required" });
+    //   hasError = true;
+    // }
+
+    // if (!data.EmpCode) {
+    //   form.setError("EmpCode", { message: "Employee Code is required" });
+    //   hasError = true;
+    // }
+
+    // if (!data.CNICNo) {
+    //   form.setError("CNICNo", { message: "CNICNo  is required" });
+    //   hasError = true;
+    // }
+
+    // if (!data.CellNo) {
+    //   form.setError("CellNo", { message: "CellNo  is required" });
+    //   hasError = true;
+    // }
+
+    // if (!data.MainDeptID) {
+    //   form.setError("MainDeptID", { message: "Main Department  is required" });
+    //   hasError = true;
+    // }
+
+    // if (!data.EmpDeptId) {
+    //   form.setError("EmpDeptId", { message: "Sub Department  is required" });
+    //   hasError = true;
+    // }
+
+    // if (!data.EmailId) {
+    //   form.setError("EmailId", { message: "EmailId  is required" });
+    //   hasError = true;
+    // }
+
+    // if (!data.JoiningDate) {
+    //   form.setError("JoiningDate", { message: "Joining date is required" });
+    //   hasError = true;
+    // }
+
+    // // Add other field validations here...
+
+    // if (hasError) return;
+
+    onSubmit({ ...data, ProfilePhoto: imagePreview });
   };
 
   const formatCnic = (value) => {
@@ -139,46 +164,49 @@ const EmployeeForm = ({
     return formatted;
   };
 
-
   const customStyles = (isDarkMode) => ({
-  control: (base , state) => ({
-    ...base,
-    backgroundColor: isDarkMode ? "#1f2937" : "", // dark: gray-800, light: white
-    borderColor: state.isFocused ? "#6366f1" : isDarkMode ? "#374151" : "#d1d5db", // dark: gray-700, light: gray-300
-    color: isDarkMode ? "#f3f4f6" : "", // dark: gray-100, light: gray-900
-    boxShadow: "none",
-    "&:hover": {
-      borderColor: isDarkMode ? "#4b5563" : "#9ca3af", // subtle hover border
-    },
-  }),
-  menu: (base) => ({
-    ...base,
-    backgroundColor: isDarkMode ? "#1f2937" : "#fff",
-    color: isDarkMode ? "#f3f4f6" : "#111827",
-  }),
-  option: (base, state) => ({
-    ...base,
-    backgroundColor: state.isSelected
-      ? isDarkMode
-        ? "#4f46e5"
-        : "#6366f1"
-      : state.isFocused
-      ? isDarkMode
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: isDarkMode ? "#1f2937" : "", // dark: gray-800, light: white
+      borderColor: state.isFocused
+        ? "#6366f1"
+        : isDarkMode
         ? "#374151"
-        : "#e5e7eb"
-      : "transparent",
-    color: isDarkMode ? "#f3f4f6" : "#111827",
-    cursor: "pointer",
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: isDarkMode ? "#f3f4f6" : "",
-  }),
-  input: (base) => ({
-    ...base,
-    color: isDarkMode ? "#f3f4f6" : "",
-  }),
-});
+        : "#d1d5db", // dark: gray-700, light: gray-300
+      color: isDarkMode ? "#f3f4f6" : "", // dark: gray-100, light: gray-900
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: isDarkMode ? "#4b5563" : "#9ca3af", // subtle hover border
+      },
+    }),
+    menu: (base) => ({
+      ...base,
+      backgroundColor: isDarkMode ? "#1f2937" : "#fff",
+      color: isDarkMode ? "#f3f4f6" : "#111827",
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected
+        ? isDarkMode
+          ? "#4f46e5"
+          : "#6366f1"
+        : state.isFocused
+        ? isDarkMode
+          ? "#374151"
+          : "#e5e7eb"
+        : "transparent",
+      color: isDarkMode ? "#f3f4f6" : "#111827",
+      cursor: "pointer",
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: isDarkMode ? "#f3f4f6" : "",
+    }),
+    input: (base) => ({
+      ...base,
+      color: isDarkMode ? "#f3f4f6" : "",
+    }),
+  });
 
   const { theme } = useTheme(); // dark / light
   const isDarkMode = theme === "dark";
@@ -189,13 +217,11 @@ const EmployeeForm = ({
       label: dept.DeptName,
     })) || [];
 
-      const mainDepartmentOptions =
+  const mainDepartmentOptions =
     mainDepartment?.map((dept) => ({
       value: dept.MainDeptId,
       label: dept.MainDeptName,
     })) || [];
-
-
 
   return (
     <Form {...form}>
@@ -208,7 +234,7 @@ const EmployeeForm = ({
             <div className="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="EmpId"
+                name="EmpCode"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Emp Code</FormLabel>
@@ -222,22 +248,108 @@ const EmployeeForm = ({
 
               <FormField
                 control={form.control}
-                name="status"
+                name="BranchId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>Unit/Branch</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="Select Branch" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                        <SelectItem value="on-leave">On Leave</SelectItem>
+                        {Branch.map((unit) => (
+                          <SelectItem key={unit.BranchID} value={unit.BranchID}>
+                            {unit.BranchName}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="MainDeptID"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sub Department</FormLabel>
+                    <Controller
+                      control={form.control}
+                      name="MainDeptID"
+                      render={({ field: { onChange, value, ref } }) => (
+                        <ReactSelect
+                          inputRef={ref}
+                          value={mainDepartmentOptions.find(
+                            (opt) => opt.value === value
+                          )}
+                          onChange={(selected) => onChange(selected?.value)}
+                          options={mainDepartmentOptions}
+                          placeholder="Select Main Department"
+                          isSearchable
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          styles={customStyles(isDarkMode)}
+                        />
+                      )}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="EmpType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Employeement Type</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Employeement Type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Salary Base">Salary Base</SelectItem>
+                        <SelectItem value="Contract Base">
+                          Contract Base
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="EmpDeptId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sub Department</FormLabel>
+                    <Controller
+                      control={form.control}
+                      name="EmpDeptId"
+                      render={({ field: { onChange, value, ref } }) => (
+                        <ReactSelect
+                          inputRef={ref}
+                          value={departmentOptions.find(
+                            (opt) => opt.value === value
+                          )}
+                          onChange={(selected) => onChange(selected?.value)}
+                          options={departmentOptions}
+                          placeholder="Select Sub Department"
+                          isSearchable
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          styles={customStyles(isDarkMode)}
+                        />
+                      )}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -273,73 +385,39 @@ const EmployeeForm = ({
 
               <FormField
                 control={form.control}
-                name="religion"
+                name="Gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Religion</FormLabel>
+                    <FormLabel>Gender</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* <FormField
+                control={form.control}
+                name="CompanyID"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Comapny ID</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-
-              <FormField
-                control={form.control}
-                name="nationality"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nationality</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="CNICNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CNIC #</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="42401-7690145-7"
-                        value={field.value}
-                        onChange={(e) => {
-                          const formatted = formatCnic(e.target.value);
-                          field.onChange(formatted); // update React Hook Form
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="CellNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="+1 555 123 4567"
-                        value={field.value}
-                        onChange={(e) => {
-                          const formatted = formatPhone(e.target.value);
-                          field.onChange(formatted); // update React Hook Form
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              /> */}
             </div>
 
             <div className="md:w-1/3 flex flex-col order-[-1] md:order-1 gap-4">
@@ -347,11 +425,13 @@ const EmployeeForm = ({
                 <FormLabel>Profile Image</FormLabel>
                 <div className="flex flex-col items-center space-y-4 p-6 border-2 border-dashed rounded-lg">
                   <Avatar className="h-32 w-32">
-                    <AvatarImage src={imagePreview} alt="Profile preview" />
+                    {imagePreview ? (
+                      <AvatarImage src={imagePreview} alt="Profile preview" />
+                    ) : null}
                     <AvatarFallback className="text-2xl">
-                      {form.watch("name")
+                      {form.watch("EmpName")
                         ? form
-                            .watch("name")
+                            .watch("EmpName")
                             .split(" ")
                             .map((n) => n[0])
                             .join("")
@@ -405,111 +485,6 @@ const EmployeeForm = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             control={form.control}
-            name="BranchId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Unit/Branch</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Branch" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Branch.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit.BranchName}
-                      </SelectItem>
-                    ))}u
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-
-         <FormField
-      control={form.control}
-      name="MainDeptID"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Sub Department</FormLabel>
-          <Controller
-            control={form.control}
-            name="EmpDeptID"
-            render={({ field: { onChange, value, ref } }) => (
-              <ReactSelect
-                inputRef={ref}
-                value={mainDepartmentOptions.find((opt) => opt.value === value)}
-                onChange={(selected) => onChange(selected?.value)}
-                options={mainDepartmentOptions}
-                placeholder="Select Main Department"
-                isSearchable
-                className="react-select-container"
-                classNamePrefix="react-select"
-                styles={customStyles(isDarkMode)}
-              />
-            )}
-          />
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-
-    <FormField
-      control={form.control}
-      name="EmpDeptID"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Sub Department</FormLabel>
-          <Controller
-            control={form.control}
-            name="EmpDeptID"
-            render={({ field: { onChange, value, ref } }) => (
-              <ReactSelect
-                inputRef={ref}
-                value={departmentOptions.find((opt) => opt.value === value)}
-                onChange={(selected) => onChange(selected?.value)}
-                options={departmentOptions}
-                placeholder="Select Sub Department"
-                isSearchable
-                className="react-select-container"
-                classNamePrefix="react-select"
-                styles={customStyles(isDarkMode)}
-              />
-            )}
-          />
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  
-
-          <FormField
-            control={form.control}
-            name="Gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Gender" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="Designation"
             render={({ field }) => (
               <FormItem>
@@ -543,7 +518,7 @@ const EmployeeForm = ({
               <FormItem>
                 <FormLabel>Joining Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input  type="date" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -552,12 +527,19 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="EmailId"
+            name="CNICNo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address</FormLabel>
+                <FormLabel>CNIC #</FormLabel>
                 <FormControl>
-                  <Input placeholder="john.doe@example.com" {...field} />
+                  <Input
+                    placeholder="#####-#######-#"
+                    value={field.value}
+                    onChange={(e) => {
+                      const formatted = formatCnic(e.target.value);
+                      field.onChange(formatted); // update React Hook Form
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -566,12 +548,19 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="role"
+            name="CellNo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Job Role</FormLabel>
+                <FormLabel>Cell #</FormLabel>
                 <FormControl>
-                  <Input placeholder="Software Engineer" {...field} />
+                  <Input
+                    placeholder="xxxx-xxxxxxx"
+                    value={field.value}
+                    onChange={(e) => {
+                      const formatted = formatPhone(e.target.value);
+                      field.onChange(formatted); // update React Hook Form
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -580,7 +569,21 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="attendanceCategory"
+            name="FormBNo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Form B Refrence</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="AttendanceCategory"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Attendance Category</FormLabel>
@@ -624,7 +627,7 @@ const EmployeeForm = ({
                 <FormLabel>Emergency Contact Number</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="+1 555 123 4567"
+                    placeholder="xxxx-xxxxxxx"
                     value={field.value}
                     onChange={(e) => {
                       const formatted = formatPhone(e.target.value);
@@ -639,14 +642,13 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="salary"
+            name="EmailId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Salary</FormLabel>
+                <FormLabel>Email Address</FormLabel>
                 <FormControl>
-                  <Input placeholder="50000.00" {...field} />
+                  <Input placeholder="john.doe@example.com" {...field} />
                 </FormControl>
-                <FormDescription>Annual salary amount</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -693,7 +695,7 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="bloodType"
+            name="BloodType"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Blood Type</FormLabel>
@@ -736,7 +738,7 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="education"
+            name="Qualification"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Education</FormLabel>
@@ -750,18 +752,21 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="country"
+            name="CountryId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Country</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={String(field.value)}
+                  onValueChange={(val) => field.onChange(Number(val))}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Country" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Pakistan">Pakistan</SelectItem>
+                    <SelectItem value="161">Pakistan</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -771,19 +776,21 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="city"
+            name="CityId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>City</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={String(field.value)}
+                  onValueChange={(val) => field.onChange(Number(val))}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select City" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Karachi">Karachi</SelectItem>
-                    <SelectItem value="Islamabad">Islamabad</SelectItem>
+                    <SelectItem value="47575">Karachi</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -793,12 +800,35 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="ResigningDate"
+            name="Status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Resigning Date</FormLabel>
+                <FormLabel>Status</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="on-leave">On Leave</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="Role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Job Role</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input placeholder="Software Engineer" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -807,21 +837,19 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="EmpType"
+            name="PostalZipCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Employeement Type</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Employeement Type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Salary Base">Salary Base</SelectItem>
-                    <SelectItem value="Contract Base">Contract Base</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel>Postal Zip Code</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter Postal Zip Code"
+                    {...field}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={10}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -829,12 +857,16 @@ const EmployeeForm = ({
 
           <FormField
             control={form.control}
-            name="FormBNo"
+            name="RosterId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Form B Refrence</FormLabel>
+                <FormLabel>Roster ID</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    placeholder="Enter Roster ID"
+                    {...field}
+                    inputMode="numeric"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

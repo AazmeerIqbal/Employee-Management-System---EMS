@@ -134,11 +134,14 @@ const EmployeeTable = ({
               <SelectValue placeholder="Department" />
             </SelectTrigger>
             <SelectContent>
-              {departments.map((dept) => (
-                <SelectItem key={dept} value={dept}>
-                  {dept === "all" ? "All Departments" : dept}
-                </SelectItem>
-              ))}
+             {departments.map((dept, index) => {
+                const value = dept || `unknown-${index}`;
+                return (
+                  <SelectItem key={value} value={value}>
+                    {dept === "all" ? "All Departments" : dept || "Unknown"}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -268,7 +271,7 @@ const EmployeeTable = ({
                           <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => onDelete(employee.id)}
+                          onClick={() => onDelete(employee.EmpId)}
                           className="text-destructive focus:text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />

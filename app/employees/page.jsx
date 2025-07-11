@@ -18,12 +18,15 @@ const Employees = () => {
   const [departments, setDepartments] = useState([]);
    const [mainDepartments, setMainDepartments] = useState([]);
     const [branch, setBranch] = useState([]);
+
+
+    console.log("Session Data:", session);
+      
     
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  console.log("Session Data:", session.user.id);
- console.log("Branch Data:", branch);
+
 
  const getEmployeeData = async () => {
   try {
@@ -36,7 +39,7 @@ const Employees = () => {
     });
 
     const data = await response.json();
-    console.log("Fetched Employees:", data.data);
+    
     
     setEmployees(data.data || []);
 
@@ -65,7 +68,7 @@ const Employees = () => {
       });
 
       const data = await response.json();
-      console.log("Fetched MainDepartments:", data.data);
+   
       
       // Assuming you want to do something with the department data
       setMainDepartments(data.data || []);
@@ -93,7 +96,7 @@ const Employees = () => {
       });
 
       const data = await response.json();
-      console.log("Fetched SubDepartments:", data.data);
+
       
       // Assuming you want to do something with the department data
       setDepartments(data.data || []);
@@ -122,7 +125,7 @@ const Employees = () => {
       });
 
       const data = await response.json();
-      console.log("Fetched SubDepartments:", data.data);
+  
       
       // Assuming you want to do something with the department data
       setBranch(data.data || []);
@@ -151,6 +154,7 @@ const Employees = () => {
   };
 
 
+
 const handleDeleteEmployee = async (employeeId) => {
   const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
   if (!confirmDelete) return;
@@ -159,6 +163,7 @@ const handleDeleteEmployee = async (employeeId) => {
     const response = await fetch(`/api/Employees/DeleteEmployee/${employeeId}`, {
       method: "DELETE",
     });
+
 
     if (!response.ok) {
       throw new Error("Failed to delete employee.");
@@ -171,6 +176,7 @@ const handleDeleteEmployee = async (employeeId) => {
 
     // Reload employee list
     await getEmployeeData();
+
   } catch (error) {
     console.error("Delete error:", error);
     toast({
@@ -179,9 +185,10 @@ const handleDeleteEmployee = async (employeeId) => {
       variant: "destructive",
     });
   }
+
+  
+    console.log("Selected Employee For Delete:", employeeId);
 };
-
-
 
   const handleAddNew = () => {
     setSelectedEmployee(null);
@@ -190,6 +197,8 @@ const handleDeleteEmployee = async (employeeId) => {
 
   const handleSubmit = async (formData) => {
   setIsSubmitting(true);
+
+   console.log("📦 Submitting to backend:", formData);
 
   try {
     const isEdit = currentView === "edit";
@@ -300,8 +309,8 @@ const handleDeleteEmployee = async (employeeId) => {
                 onSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
                 mainDepartment={mainDepartments}
-                    subDepartment={departments}
-                    Branch={branch}
+                subDepartment={departments}
+                Branch={branch}
               />
             </div>
           </>

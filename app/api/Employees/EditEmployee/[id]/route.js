@@ -1,11 +1,11 @@
-import { connectToDB, closeConnection, config } from "@/utils/database";
 import { NextResponse } from "next/server";
+import { connectToDB, closeConnection, config } from "@/utils/database";
 
-// PATCH /api/employee/edit/[id]
-export async function PATCH(req, { params }) {
+export async function PUT(req, { params }) {
   try {
     const { id } = params;
     const EmpId = parseInt(id);
+
     if (!EmpId || isNaN(EmpId)) {
       return NextResponse.json(
         { message: "Invalid EmpId in URL." },
@@ -13,55 +13,49 @@ export async function PATCH(req, { params }) {
       );
     }
 
-    const body = await req.json(); // Incoming updated data
-
+    const body = await req.json();
     const pool = await connectToDB(config);
 
     await pool
       .request()
       .input("EmpId", EmpId)
-      .input("CompanyID", body.companyId)
-      .input("BranchId", body.branchId)
-      .input("EmpCode", body.empCode)
-      .input("MainDeptID", body.mainDeptId)
-      .input("EmpDeptId", body.empDeptId)
-      .input("EmpType", body.empType)
-      .input("EmpName", body.empName)
-      .input("FatherName", body.fatherName)
-      .input("Gender", body.gender)
-      .input("Designation", body.designation)
-      .input("DOB", body.dob)
-      .input("JoiningDate", body.joiningDate)
-      .input("ResigningDate", body.resigningDate || null)
-      .input("CNICNo", body.cnicNo)
-      .input("CellNo", body.cellNo)
-      .input("EmergencyContactName", body.emergencyContactName)
-      .input("EmergencyContactNo", body.emergencyContactNo)
-      .input("EmailId", body.emailId)
-      .input("PostalAddress", body.postalAddress)
-      .input("CountryId", body.countryId)
-      .input("CityId", body.cityId)
-      .input("PostalZipCode", body.postalZipCode)
-      .input("BloodType", body.bloodType)
-      .input("MaritalStatus", body.maritalStatus)
-      .input("Dependents", body.dependents)
-      .input("ProfilePhoto", body.profilePhoto)
+      .input("CompanyID", body.CompanyID)
+      .input("BranchId", body.BranchId)
+      .input("EmpCode", body.EmpCode)
+      .input("MainDeptID", body.MainDeptID)
+      .input("EmpDeptId", body.EmpDeptId)
+      .input("EmpType", body.EmpType)
+      .input("EmpName", body.EmpName)
+      .input("FatherName", body.FatherName)
+      .input("Gender", body.Gender)
+      .input("Designation", body.Designation)
+      .input("DOB", body.DOB)
+      .input("JoiningDate", body.JoiningDate)
+      .input("ResigningDate", body.ResigningDate || null)
+      .input("CNICNo", body.CNICNo)
+      .input("CellNo", body.CellNo)
+      .input("PostalZipCode", body.PostalZipCode)
+      .input("EmergencyContactName", body.EmergencyContactName)
+      .input("EmergencyContactNo", body.EmergencyContactNo)
+      .input("EmailId", body.EmailId)
+      .input("PostalAddress", body.PostalAddress)
+      .input("CountryId", body.CountryId)
+      .input("CityId", body.CityId)
+      .input("BloodType", body.BloodType)
+      .input("ProfilePhoto", body.ProfilePhoto || null)
+      .input("MaritalStatus", body.MaritalStatus)
+      .input("Dependents", body.Dependents)
+      .input("Qualification", body.Qualification)
+      .input("LastCompany", body.LastCompany)
+      .input("Note", body.Note)
+      .input("CreatedOn", new Date())
+      .input("CreatedBy", body.UserId || null)
       .input("LastUpdatedOn", new Date())
-      .input("LastUpdatedBy", body.lastUpdatedBy)
-      .input("Del", body.del ?? 0)
-      .input("IsSalaryTransfer", body.isSalaryTransfer)
-      .input("BankName", body.bankName)
-      .input("AccountNo", body.accountNo)
-      .input("IsOTApply", body.isOTApply)
-      .input("IsActive", body.isActive)
-      .input("IsAttRequired", body.isAttRequired)
-      .input("Qualification", body.qualification)
-      .input("LastCompany", body.lastCompany)
-      .input("Note", body.note)
-      .input("PermanentAddress", body.permanentAddress)
-      .input("IsOTOnHolidays", body.isOTOnHolidays)
-      .input("FormBNo", body.formBNo)
-      .input("RosterId", body.rosterId).query(`
+      .input("LastUpdatedBy", body.UserId || null)
+      .input("PermanentAddress", body.PermanentAddress)
+      .input("FormBNo", body.FormBNo)
+      .input("RosterId", body.RosterId)
+      .query(`
         UPDATE Employee_mst SET
           CompanyID = @CompanyID,
           BranchId = @BranchId,
@@ -78,33 +72,27 @@ export async function PATCH(req, { params }) {
           ResigningDate = @ResigningDate,
           CNICNo = @CNICNo,
           CellNo = @CellNo,
+          ProfilePhoto = @ProfilePhoto,
+          PostalZipCode = @PostalZipCode,
           EmergencyContactName = @EmergencyContactName,
           EmergencyContactNo = @EmergencyContactNo,
           EmailId = @EmailId,
           PostalAddress = @PostalAddress,
           CountryId = @CountryId,
           CityId = @CityId,
-          PostalZipCode = @PostalZipCode,
           BloodType = @BloodType,
           MaritalStatus = @MaritalStatus,
           Dependents = @Dependents,
-          ProfilePhoto = @ProfilePhoto,
-          LastUpdatedOn = @LastUpdatedOn,
-          LastUpdatedBy = @LastUpdatedBy,
-          Del = @Del,
-          IsSalaryTransfer = @IsSalaryTransfer,
-          BankName = @BankName,
-          AccountNo = @AccountNo,
-          IsOTApply = @IsOTApply,
-          IsActive = @IsActive,
-          IsAttRequired = @IsAttRequired,
           Qualification = @Qualification,
           LastCompany = @LastCompany,
           Note = @Note,
           PermanentAddress = @PermanentAddress,
-          IsOTOnHolidays = @IsOTOnHolidays,
           FormBNo = @FormBNo,
-          RosterId = @RosterId
+          RosterId = @RosterId,
+          CreatedOn = @CreatedOn,
+          CreatedBy = @CreatedBy,
+          LastUpdatedOn = @LastUpdatedOn,
+          LastUpdatedBy = @LastUpdatedBy
         WHERE EmpId = @EmpId
       `);
 
@@ -112,7 +100,7 @@ export async function PATCH(req, { params }) {
 
     return NextResponse.json({
       message: `Employee with ID ${EmpId} updated successfully.`,
-    });
+    }); // ✅ proper JSON response
   } catch (error) {
     console.error("Error updating employee:", error);
     return NextResponse.json(
